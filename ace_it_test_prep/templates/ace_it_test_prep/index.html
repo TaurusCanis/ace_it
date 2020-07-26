@@ -1,0 +1,53 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-6 align-items-center">
+				<h1>Ace-It Test Prep</h1>
+				<h2>Sign-up!</h2>
+				<form class="sign-up-form" action="{% url 'ace_it_test_prep:signup' %}" method="post">
+					{% csrf_token %}
+					<!-- {{ form }} -->
+					<div>
+						<label for="first_name">First Name: </label>
+						<input type="first_name" placeholder="First Name" name="first_name">
+					</div>
+					<div>
+						<label for="last_name">Last Name: </label>
+						<input type="last_name" placeholder="Last Name" name="last_name">
+					</div>
+					<div>
+						<label for="username">Username: </label>
+						<input type="username" placeholder="Username" name="username">
+					</div>
+					<div>
+						<label for="password">Password: </label>
+						<input type="password" placeholder="Password" name="password">
+					</div>
+					<div>
+						<label for="test_selection">Choose Test: </label>
+						<select id="test_selection" name="test_selection">
+							<option id="ssat" name="scat">SSAT</option>
+						</select>
+					</div>
+					<div>
+						<label for="user_type">User Type: </label>
+						<select id="user_type" name="user_type">
+							<option id="student" name="student" value="student">Student</option>
+							<option id="parent" name="parent" value="parent">Parent</option>
+							<option id="instructor" name="instructor" value="instructor">Instructor</option>
+						</select>
+					</div>
+					<input type="submit" value="Sign-Up">
+				</form>
+			</div> <!-- signup_form container -->
+		</div> <!-- container sign-up -->
+	</div> <!-- container -->
+{% endblock %}

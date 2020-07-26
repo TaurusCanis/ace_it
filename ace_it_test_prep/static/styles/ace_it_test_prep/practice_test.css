@@ -1,0 +1,11 @@
+.selected_answer {
+  color: orange;
+}
+
+.question_container {
+  margin: 1em;
+}
+
+.navigation-btns {
+  margin: 1em;
+}

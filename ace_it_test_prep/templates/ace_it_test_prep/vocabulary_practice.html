@@ -1,0 +1,63 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+
+
+  <div id="term">{{ first_term.term }}</div>
+  <div id="synonyms" style="display:none">{{ first_term.synonyms_list }}</div>
+  <button id="flip_btn">Show Synonyms</button>
+  <button id="next_btn">Next Synonym</button>
+  <form action="{% url 'ace_it_test_prep:test_synonyms' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="serialized_data" id="serialized_data" value="{{ serialized_data }}">
+    <button type="submit" id="test_syns">Test Synonyms</button>
+  </form>
+
+  <script type="text/javascript">
+    window.onload = function() {
+      var terms = JSON.parse("{{ serialized_data|escapejs }}")
+      var currentTermIndex = 0
+      var numSyns = terms.length
+      console.log("terms: ", terms)
+      console.log("terms type: ", typeof(terms))
+      for (term of terms) {
+        console.log("term: ", term.fields.term)
+      }
+      var synonymsDisplayed = false;
+      var termDiv = document.getElementById("term")
+      var synonymsDiv = document.getElementById("synonyms")
+      var flipBtn = document.getElementById("flip_btn")
+
+      flipBtn.addEventListener("click", function() {
+        if (synonymsDisplayed) {
+          synonymsDisplayed= false
+          synonymsDiv.style.display = "none"
+          termDiv.style.display = "block"
+        } else {
+          synonymsDisplayed= true
+          synonymsDiv.style.display = "block"
+          termDiv.style.display = "none"
+        }
+
+      });
+
+      var nextBtn = document.getElementById("next_btn")
+      nextBtn.addEventListener("click", function() {
+        currentTermIndex += 1
+        if (currentTermIndex == numSyns) {
+          currentTermIndex = 0
+        }
+        termDiv.innerHTML = terms[currentTermIndex].fields.term
+
+      });
+
+    }
+  </script>
+
+{% endblock %}

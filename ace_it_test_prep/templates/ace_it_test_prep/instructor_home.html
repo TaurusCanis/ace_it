@@ -1,0 +1,26 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+  <h1> Welcome, {{ request.user.first_name }}!</h1>
+  <h2> You are {{ profile_type }}</h2>
+<div>
+  Students
+  {% for student in students %}
+  <div>
+    {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
+    <a href="{% url 'ace_it_test_prep:student_profile' student_id=student.id %}">Student Profile</a>
+  </div>
+  {% endfor %}
+</div>
+<form action="{% url 'ace_it_test_prep:add_student' %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="Add Student">
+</form>
+
+{% endblock %}

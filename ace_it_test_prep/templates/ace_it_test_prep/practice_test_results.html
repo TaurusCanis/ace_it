@@ -1,0 +1,89 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+  {% block head %}
+  {% load static %}
+  <script src="{% static 'scripts/practice_test_script.js' %}"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js">
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test_results.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}"> -->
+  {% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+
+<div>
+  <a id="pracrice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=test_session_id %}">Back to Results Overview</a>
+</div>
+
+<div>
+  Student Name: {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
+</div>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Question</th>
+      <th>Your Answer</th>
+      <th>Correct Answer</th>
+    </tr>
+  </thead>
+  <h1>The answers should be here</h1>
+
+
+{% for test_response, question in zipped_data %}
+
+  <tr {% if test_response.correct is False %}class="wrong"{% endif %}>
+    <td>{{ question.number }}</td>
+    <td>{{ question.question }}</td>
+    <td>
+      {% if test_response.response == 0 %}
+        A. {{ question.option_a }}
+      {% elif test_response.response == 1 %}
+        B. {{ question.option_b }}
+      {% elif test_response.response == 2 %}
+        C. {{ question.option_c }}
+      {% elif test_response.response == 3 %}
+        D. {{ question.option_d }}
+      {% elif question.correct_answer == '4' %}
+        E. {{ question.option_d }}
+      {% else %}
+        Not Answered
+      {% endif %}
+    </td>
+    <td>
+      {% if question.correct_answer == '0' %}
+        A. {{ question.option_a }}
+      {% elif question.correct_answer == '1' %}
+        B. {{ question.option_b }}
+      {% elif question.correct_answer == '2' %}
+        C. {{ question.option_c }}
+      {% elif question.correct_answer == '3' %}
+        D. {{ question.option_d }}
+      {% elif question.correct_answer == '4' %}
+        E. {{ question.option_d }}
+      {% else %}
+        Not Answered
+      {% endif %}
+    </td>
+    <td>
+      {{ test_response.id }}
+      {{ question.id }}
+      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+        {% csrf_token %}
+        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+        <input type="hidden" value="{{ question.id }}" name="question_id">
+        <button type="submit">Detail</button>
+      </form>
+    </td>
+  </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

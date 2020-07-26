@@ -1,0 +1,128 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% load ace_it_extras %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+<div id="term">
+  {{ term_data.0.tested_term|upper }}
+</div>
+<div id="synonyms">
+  {% for answer_option in term_data.0.answer_options_list %}
+  <div>
+    <span>{{ forloop.counter|to_char }}</span>
+    <span id="{{ index }}" class="answer_option">{{ answer_option }}</span>
+  </div>
+  {% endfor %}
+</div>
+<button id="next_btn">Next Synonym</button>
+<form action="{% url 'ace_it_test_prep:score_synonyms_practice' %}" method="post" id="submit_test">
+  {% csrf_token %}
+  <input type="hidden" value="{{ term_data }}" name="term_data" id="term_data">
+  <input type="hidden" value="" name="user_answer_selections" id="user_answer_selections">
+  <input type="submit">
+</form>
+
+<!-- <script type="text/javascript">
+  window.onload = function() {
+    var terms = JSON.parse("{{ serialized_data|escapejs }}")
+    var currentTermIndex = 0
+    var numSyns = terms.length
+    console.log("terms***: ", terms)
+    console.log("terms type: ", typeof(terms))
+    for (term of terms) {
+      console.log("term: ", term.fields.term)
+    }
+
+  var nextBtn = document.getElementById("next_btn")
+  nextBtn.addEventListener("click", function() {
+    currentTermIndex += 1
+    if (currentTermIndex == numSyns) {
+      currentTermIndex = 0
+    }
+    termDiv.innerHTML = terms[currentTermIndex].fields.term
+
+  });
+</script> -->
+<script type="text/javascript">
+  window.onload = function() {
+    var terms = JSON.parse("{{ term_data_json|escapejs }}")
+    var answerOptionSpans = document.querySelectorAll(".answer_option")
+    var termDiv = document.getElementById("term")
+    var currentTermIndex = 0
+    var submitTestBtn = document.querySelector("#submit_test")
+    submitTestBtn.style.display = "none"
+
+    var numSyns = terms.length
+    var userAnswerSelections = Array(numSyns).fill(-1)
+
+    answerOptionSpans.forEach((item, i) => {
+      item.addEventListener("click", function() {
+        if (item.classList.contains("selected")) {
+          item.style.color = "black"
+          item.classList.remove("selected")
+          userAnswerSelections[currentTermIndex] = -1
+        } else {
+          answerOptionSpans.forEach((span, n) => {
+            span.style.color = "black"
+            span.classList.remove("selected")
+          });
+          item.style.color = "orange"
+          item.classList.add("selected")
+          console.log("i: ", i)
+          console.log("currentTermIndex: ", currentTermIndex)
+          userAnswerSelections[currentTermIndex] = i
+        }
+        console.log("userAnswerSelections: ", userAnswerSelections)
+      });
+    });
+
+
+    console.log("terms: ", terms)
+
+
+    console.log("userAnswerSelections: ", userAnswerSelections)
+
+    var synonymsDisplayed = false;
+
+    var synonymsDiv = document.getElementById("synonyms")
+
+    var nextBtn = document.getElementById("next_btn")
+    nextBtn.addEventListener("click", function() {
+
+      currentTermIndex += 1
+      if (currentTermIndex == numSyns) {
+        // currentTermIndex = 0
+        submitTestBtn.style.display = "block"
+        nextBtn.style.display = "none"
+        var formDataInput = document.querySelector("#user_answer_selections")
+        formDataInput.value = userAnswerSelections
+      } else {
+        termDiv.innerHTML = terms[currentTermIndex].tested_term
+
+        answerOptionSpans.forEach((item, i) => {
+          item.innerHTML = terms[currentTermIndex]["answer_options_list"][i]
+          item.style.color = "black"
+          item.classList.remove("selected")
+          if (userAnswerSelections[currentTermIndex] != -1) {
+            if (userAnswerSelections[currentTermIndex] == i) {
+              item.style.color = "orange"
+              item.classList.add("selected")
+            }
+          }
+        });
+      }
+
+
+
+    });
+
+  }
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+  <h1>Practice Test 1</h1>
+  <div>
+    Student Name: {{ user.first_name }} {{ user.last_name }}
+  </div>
+  <div class="container">
+    {% for section_data in sections_data %}
+    <div class="test_section">
+      {% if section_data.completed %}
+        View Results
+        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=section_data.section %}">{{section_data.section}}</a>
+      {% else %}
+        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_start_page' id=test_id section=section_data.section %}">{{section_data.section}}</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}

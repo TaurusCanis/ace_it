@@ -1,0 +1,23 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+Student Profile for {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
+<div>
+  Assign {{ test.name }} to {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
+  <form action="{% url 'ace_it_test_prep:save_new_assignment' %}" method="post">
+    {% csrf_token %}
+    <label for="due_date">Due Date:</label>
+    <input type="datetime-local" name="due_date" id="due_date">
+    <input type="hidden" value="{{ test.id }}" name="test_id" id="test_id">
+    <input type="hidden" value="{{ student.id }}" name="student_id" id="student_id">
+    <input type="submit" value="Assign to Student">
+  </form>
+
+</div>
+{% endblock %}

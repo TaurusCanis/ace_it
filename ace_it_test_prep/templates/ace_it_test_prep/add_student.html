@@ -1,0 +1,19 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+Add New Student
+<form action="{% url 'ace_it_test_prep:invite_student' %}" method="post">
+  {% csrf_token %}
+  <input name="student_email" id="student_email" type="email" placeholder="email address">
+  <input name="student_first_name" id="student_first_name" type="text" placeholder="first_name">
+  <input name="student_last_name" id="student_last_name" type="text" placeholder="last_name">
+  <input type="submit" value="Invite Student">
+</form>
+
+{% endblock %}

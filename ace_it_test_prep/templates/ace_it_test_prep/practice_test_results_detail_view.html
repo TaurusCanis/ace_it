@@ -1,0 +1,72 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% load ace_it_extras %}
+{% block title %}Home{% endblock %}
+  {% block head %}
+  {% load static %}
+  <script src="{% static 'scripts/practice_test_results_detail_script.js' %}"></script>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test_results.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}"> -->
+  {% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+<a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=question.section %}">Back to Section Overview</a>
+<div>
+  <div>Test Response: {{ test_response }}</div>
+  <span>{{ question.number }}. </span>
+  <span>{{ question.question_text }}</span>
+  <div>
+    {% for answer in answers %}
+
+    <div
+      {% if answer.value == test_response.response and answer.value != question.correct_answer|to_int %} class='wrong' {% endif %}
+      {% if answer.value == question.correct_answer|to_int %} class='right' {% endif %}
+    >{{ forloop.counter|to_char }}. {{ answer.option }}</div>
+    <div>
+      Explanation: {{ answer.explanation }}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="navigation-btns">
+    <div class="navigation-btns-container">
+      <span class="navigation-btn" id="back-btn">Back</span>
+      <span class="navigation-btn" id="next-btn">Next</span>
+      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+        {% csrf_token %}
+        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+        <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
+        <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
+        <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
+        <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
+        <input type="hidden" value="{{ question.section }}" name="section">
+        <input type="hidden" value="back" name="action">
+        <button type="submit">Back</button>
+      </form>
+      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+        {% csrf_token %}
+        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+        <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
+        <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
+        <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
+        <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
+        <input type="hidden" value="{{ question.section }}" name="section">
+        <input type="hidden" value="next" name="action">
+        <button type="submit">Next</button>
+      </form>
+    </div>
+    <form action="{% url 'ace_it_test_prep:practice_test_results' test_session_id %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value="{{ test_session_id }}" name="test_session_id">
+      <button type="submit">Return to Overview</button>
+    </form>
+  </div>
+</div>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js">
+</script>
+
+{% endblock %}

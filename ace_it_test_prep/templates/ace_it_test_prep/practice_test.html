@@ -1,0 +1,118 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% load ace_it_extras %}
+{% block title %}Home{% endblock %}
+  {% block head %}
+  {% load static %}
+  <script src="{% static 'scripts/practice_test_script.js' %}"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js">
+  </script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'styles/ace_it_test_prep/practice_test.css' %}"> -->
+  {% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+  <h1>Practice Test 1</h1>
+  <input type="hidden" class="remaining_time" value="0">
+  	<div class="container">
+  		<div class="top-div">
+        <div class="timer"><span class="mins">{{ time_limit }}</span>:<span class="secs">00</span></div>
+        <input type="hidden" class="remaining_time" value="0">
+        <input type=hidden class="timer mins" id="time_remaining_mins" value="{{ time_limit }}">
+        <input type=hidden class="timer secs" id="time_remaining_secs" value="00">
+
+  		</div>
+      <div id="question_num_btns">
+        {% for num in question_nums_range %}
+          <span class="question_num_btn" id="question_num_btns_index_{{forloop.counter0}}">{{ forloop.counter }}</span>
+        {% endfor %}
+      </div>
+
+  		<!-- <div class="questions"> -->
+
+
+      <!-- <div>Average Time Remaining Per Question: <span>24</span> seconds per question</div> -->
+        <div class="question_container">
+          <div class="num">
+            <span id="num">{{ data.0.question.number }}</span>
+  				</div>
+          {% if passages %}
+          <div id="passage">
+            Passage {{ passages.0.text }}
+            Test {{ data.0.question.test }}
+          </div>
+          {% endif %}
+          <div class="question-detail-container">
+            <div id="question">{{ data.0.question.question_text }} </div>
+            <input id="question_id" type="hidden" value="{{data.0.question.id}}"
+            <div>{{ context.0.question.question_detail_text }}</div>
+            <div>
+              {% if data.0.question.diagram_src %}
+              <img id="diagram" src="{{ data.0.question.diagram_src }}">
+              {% endif %}
+
+            </div>
+
+          </div>
+          <div class="answer_choices_container">
+
+            <div class="answer_choices">
+              {% for answer_choice in data.0.answers %}
+                <div id="{{ answer_choice.value }}" class="answer_choice">{{ forloop.counter|to_char }}. {{ answer_choice.option }}</div>
+              {% endfor %}
+
+
+              <div class="answer_options_container">
+              </div>
+            </div>
+
+            <div id="question-nums"></div>
+            <!-- <form class="submit_test_form" method="POST", action="{% url 'ace_it_test_prep:submit_section' %}">
+              {% csrf_token %}
+              <input type="submit" id="submit_test" value="Submit Test">
+              <input type="hidden" id="session_id" name="session_id" value="">
+              <input type="hidden" id="test_id" name="test_id" value="">
+            </form> -->
+          </div>
+        </div>
+        <div class="container">
+          <div class="navigation-btns container">
+            <div class="navigation-btns-container">
+              <span class="navigation-btn" id="back-btn">Back</span>
+              <span class="navigation-btn" id="next-btn">Next</span>
+            </div>
+          </div>
+          <div class="test_section">
+            <form action="{% url 'ace_it_test_prep:submit_section' %}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" id="test_session_id" name="test_session_id" value="{{ test_session_id }}">
+              <input type="hidden" id="question_nums" name="question_nums" value="{{ question_nums }}">
+              <input type="hidden" id="section" name="section" value="{{ section }}">
+              <button type="submit">Submit Test Section</button>
+            </form>
+          </div>
+        </div>
+
+  	<!-- </div> -->
+  </div>
+
+
+  	{% load static %}
+  		<!-- <script src="{% static 'prep/scripts/practice_test_script.js' %}"></script> -->
+  		<!-- <script>
+  			var answerOptions = document.getElementsByClassName("answer-option");
+  	    // var context = JSON.parse("{{ context | escapejs }}");
+        var context = JSON.parse({{ context | escapejs }})
+        var static_url = "{% static '' %}";
+        console.log("context: " + context)
+        // contextArr = JSON.parse('{{ context_arr | escapejs }}');
+  		</script> -->
+
+      <script src="{% static 'scripts/practice_test.js' %}"></script>
+  		<script src="{% static 'scripts/timer.js' %}"></script>
+
+
+      {% endblock %}
