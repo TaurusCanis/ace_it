@@ -1,0 +1,15 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+
+{% endblock %}
+{% block header %}
+
+{% endblock %}
+{% block content %}
+<ul>
+    {% for category in categories %}
+        <li><a href="{% url 'ace_it_test_prep:vocabulary_by_category' category=category %}">{{ category }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -14,59 +14,83 @@
 
 {% endblock %}
 {% block content %}
-<a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=question.section %}">Back to Section Overview</a>
-<div>
-  <div>Test Response: {{ test_response }}</div>
-  <span>{{ question.number }}. </span>
-  <span>{{ question.question_text }}</span>
-  <div>
-    {% for answer in answers %}
-
-    <div
-      {% if answer.value == test_response.response and answer.value != question.correct_answer|to_int %} class='wrong' {% endif %}
-      {% if answer.value == question.correct_answer|to_int %} class='right' {% endif %}
-    >{{ forloop.counter|to_char }}. {{ answer.option }}</div>
-    <div>
-      Explanation: {{ answer.explanation }}
-    </div>
-    {% endfor %}
+<div class="container">
+  <div class="row p-2 my-2">
+    <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=question.section %}">Back to Section Overview</a>
   </div>
-  <div class="navigation-btns">
-    <div class="navigation-btns-container">
-      <span class="navigation-btn" id="back-btn">Back</span>
-      <span class="navigation-btn" id="next-btn">Next</span>
-      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+  <h4 class="row pt-2 mt-2">
+    <span class="pr-2">{{ question.number }}. </span>
+     <span>{% if question.section == "verbal" %}{{ question.question_text|verbal_uppercase|safe }}{% else %}{{ question.question_text|safe }}{% endif %}</span>
+  </h4>
+  <div class="row p-2 my-2">
+    <div class="container">
+      {% for answer in answers %}
+      <div class="row">
+        <h5
+        {% if answer.value == test_response.response and answer.value != question.correct_answer|to_int %} class='wrong' {% endif %}
+        {% if answer.value == question.correct_answer|to_int %} class='right' {% endif %}
+      >{{ forloop.counter|to_char }}. {% if question.section == "verbal" %} {{ answer.option|verbal_uppercase|safe }}{% else %}{{ answer.option|safe }}{% endif %}</h5>
+      </div>
+      
+      <div class="row pb-2 pl-2">
+        <!-- <span class="toggle_btn">+ </span> -->
+        <span class="" id="anwser_explanation">{{ answer.explanation|safe }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="navigation-btns container">
+      <div class="navigation-btns-container row justify-content-between px-3">
+        <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+          {% csrf_token %}
+          <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+          <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
+          <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
+          <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
+          <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
+          <input type="hidden" value="{{ question.section }}" name="section">
+          <input type="hidden" value="back" name="action">
+          <button type="submit" class="btn btn-primary">Back</button>
+        </form>
+        <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+          {% csrf_token %}
+          <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+          <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
+          <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
+          <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
+          <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
+          <input type="hidden" value="{{ question.section }}" name="section">
+          <input type="hidden" value="next" name="action">
+          <button type="submit" class="btn btn-primary">Next</button>
+        </form>
+      </div>
+      <form class="text-center" action="{% url 'ace_it_test_prep:practice_test_results' test_session_id %}" method="POST">
         {% csrf_token %}
-        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
-        <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
-        <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
-        <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
-        <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
-        <input type="hidden" value="{{ question.section }}" name="section">
-        <input type="hidden" value="back" name="action">
-        <button type="submit">Back</button>
-      </form>
-      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
-        {% csrf_token %}
-        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
-        <input type="hidden" value="{{ test_response.question.id }}" name="question_id">
-        <input type="hidden" value="{{ test_response.question.number }}" name="question_number">
-        <input type="hidden" value="{{ test_response.session.test.id }}" name="test_id">
-        <input type="hidden" value="{{ test_response.session.id }}" name="test_session_id">
-        <input type="hidden" value="{{ question.section }}" name="section">
-        <input type="hidden" value="next" name="action">
-        <button type="submit">Next</button>
+        <input type="hidden" value="{{ test_session_id }}" name="test_session_id">
+        <button type="submit" class="btn btn-primary">Return to Overview</button>
       </form>
     </div>
-    <form action="{% url 'ace_it_test_prep:practice_test_results' test_session_id %}" method="POST">
-      {% csrf_token %}
-      <input type="hidden" value="{{ test_session_id }}" name="test_session_id">
-      <button type="submit">Return to Overview</button>
-    </form>
   </div>
 </div>
 <script type="text/javascript" id="MathJax-script" async
   src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js">
 </script>
+<!-- <script>
+  btnToggleGroup = document.querySelectorAll(".toggle_btn")
+  explanationGroup = document.querySelectorAll("#anwser_explanation")
 
+  console.log("btnToggleGroup: ", btnToggleGroup)
+  console.log("explanationGroup: ", explanationGroup)
+
+  btnToggleGroup.forEach(element, index => {
+    element.addEventListener("click", function() {
+    if (explanationGroup[index].classList.contains("hidden")) {
+      explanationGroup[index].classList.remove("hidden")
+    } else {
+      explanationGroup[index].classList.add("hidden")
+    }
+  })
+  });
+</script> -->
 {% endblock %}

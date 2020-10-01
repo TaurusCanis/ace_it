@@ -7,67 +7,129 @@
 
 {% endblock %}
 {% block content %}
-  <h1> Welcome, {{ request.user.first_name }}!</h1>
-  <h2> You are {{ profile_type }}</h2>
-  <h3>Test Type: {{ test_type }}</h3>
-  {% if instructor %}
-  <h3>Instructor name: {{ instructor.user_profile.user.first_name }} {{ instructor.user_profile.user.last_name }}</h3>
-  {% endif %}
   <div class="container">
-    <div class="practice">
-      <h1>Recommended Practice</h1>
-      <h2>Incomplete Assignments<h2>
-      {% for assignment in incomplete_assignments %}
-        <div>{{ assignment.test.name }}
-          Due Date: {{ assignment.due_date }}
-          Date Assigned: {{ assignment.date_assigned }}
-          <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=assignment.test.id student_id=student_id %}">Start Now</a>
-        </div>
-      {% endfor %}
-      <h2>Completed Assignments</h2>
-      {% for assignment in completed_assignments %}
-        <div>{{ assignment.test.name }}
-          Due Date: {{ assignment.due_date }}
-          Date Assigned: {{ assignment.date_assigned }}
-          <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=assignment.assignmentsession_set.first.test_session.id %}">View Results</a>
-        </div>
-      {% endfor %}
-
-      <h1>Pratice Tests</h1>
-      {% for ssat_practice_test in ssat_practice_test_list %}
-        {% if ssat_practice_test.test_status == "completed" %}
-          <div>
-            <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=ssat_practice_test.test_session.id %}">View Results: SSAT - Practice Test {{forloop.counter}}</a>
-          </div>
-          <!-- <div>
-            <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">Take Again: SSAT - Practice Test {{forloop.counter}}</a>
-          </div> -->
-        {% elif ssat_practice_test.test_status == "started" %}
-          RESUME TEST
-          <div>
-            <a id="pracrite_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">SSAT - Practice Test {{forloop.counter}}</a>
-          </div>
-        {% else %}
-          <div>
-            <a id="pracrite_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">SSAT - Practice Test {{forloop.counter}}</a>
-          </div>
-        {% endif %}
-      {% endfor %}
-      <h1>Math Practice</h1>
-      <a href="{% url 'ace_it_test_prep:math_practice_overview' %}">Math Practice</a>
-      <h1>Reading Practice</h1>
-      <a href="{% url 'ace_it_test_prep:reading_practice_overview' %}">Reading Practice</a>
-      <h1>Verbal Practice</h1>
-      <a href="{% url 'ace_it_test_prep:verbal_practice_overview' %}">Verbal Practice</a>
+    <div class="row justify-content-center">
+      <h1> Welcome, {{ request.user.first_name }}!</h1>
+      <!-- <h3>Test Type: {{ test_type }}</h3>
+      {% if instructor %}
+      <h3>Instructor name: {{ instructor.user_profile.user.first_name }} {{ instructor.user_profile.user.last_name }}</h3>
+      {% endif %} -->
     </div>
-    <div class="results">
+    <div class="row">
+      {% if instructor %}
+      <h2>Today's Practice Plan</h2>
+    </div>
+    <div class="row">
+      <div class="container">
+          {% for assignment in incomplete_assignments %}
+          <div class="row">
+            {{ assignment.test.name }}
+            Due Date: {{ assignment.due_date }}
+            Date Assigned: {{ assignment.date_assigned }}
+            <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=assignment.test.id student_id=student_id %}">Start Now</a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row">
+      <h2>Completed Assignments</h2>
+        <div class="container">
+          {% for assignment in completed_assignments %}
+          <div class="row">
+            {{ assignment.test.name }}
+            Due Date: {{ assignment.due_date }}
+            Date Assigned: {{ assignment.date_assigned }}
+            <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=assignment.assignmentsession_set.first.test_session.id %}">View Results</a>
+          </div>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="row my-5">
+      {% endif %}
+      <div class="col">
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>Pratice Tests</h5>
+              </div>
+              <div class="card-text">
+                <div class="container">
+                  {% for ssat_practice_test in ssat_practice_test_list %}
+                  <div class="row">
+                    {% if ssat_practice_test.test_status == "completed" %}
+                      <div>
+                        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=ssat_practice_test.test_session.id %}">View Results: SSAT - Practice Test {{forloop.counter}}</a>
+                      </div>
+                      <!-- <div>
+                        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">Take Again: SSAT - Practice Test {{forloop.counter}}</a>
+                      </div> -->
+                    {% elif ssat_practice_test.test_status == "started" %}
+                      RESUME TEST
+                      <div>
+                        <a id="pracrite_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">SSAT - Practice Test {{forloop.counter}}</a>
+                      </div>
+                    {% else %}
+                      <div>
+                        <a id="pracrite_test_link" href="{% url 'ace_it_test_prep:practice_test_detail' test_id=ssat_practice_test.practice_test.id student_id=student_id %}">SSAT - Practice Test {{forloop.counter}}</a>
+                      </div>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="row p-0 my-5">
+      <div class="col-4">
+        <div class="container p-0 m-0">
+          <div class="card p-0 m-0">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>Math Practice</h5>
+                <a href="{% url 'ace_it_test_prep:math_practice_overview' %}">Math Practice</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4"> 
+        <div class="container p-0 m-0">
+          <div class="card p-0 m-0">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>Reading Practice</h5>
+                <a href="{% url 'ace_it_test_prep:reading_practice_overview' %}">Reading Practice</a>
+               </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="col-4">
+        <div class="container p-0 m-0">
+          <div class="card p-0 m-0">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>Verbal Practice</h5>
+                <a href="{% url 'ace_it_test_prep:verbal_practice_overview' %}">Verbal Practice</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="results">
       <h1>View Results</h1>
     </div>
     <div class="progress-experience">
       <h1>Progress</h1>
       <h2>Experience Points</h2>
       <h2>Skills Points</h2>
-    </div>
+    </div> -->
   </div>
 
 {% endblock %}

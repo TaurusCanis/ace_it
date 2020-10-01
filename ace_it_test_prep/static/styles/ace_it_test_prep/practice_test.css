@@ -1,5 +1,5 @@
 .selected_answer {
-  color: orange;
+  color: #0275d8;
 }
 
 .question_container {
@@ -8,4 +8,12 @@
 
 .navigation-btns {
   margin: 1em;
+}
+
+.hidden {
+  display: none;
+}
+
+.eliminated {
+  text-decoration: line-through;
 }

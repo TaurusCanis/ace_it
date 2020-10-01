@@ -7,11 +7,18 @@
 
 {% endblock %}
 {% block content %}
-  <h1>Practice Test 1</h1>
-  <div class="container">
+<div class="container">
+  <div class="row">
+    <h1>Practice Test 1</h1>
+  </div>
+  
+  <div class="row">
     <div class="test_section">
-      <a id="pracrice_test_link" href="{% url 'ace_it_test_prep:practice_test' test_id=test_id section=section %}">Begin</a>
+      <a class="btn btn-primary" id="pracrice_test_link" href="{% url 'ace_it_test_prep:practice_test' test_id=test_id section=section %}">Begin</a>
     </div>
   </div>
+
+</div>
+  
 
 {% endblock %}

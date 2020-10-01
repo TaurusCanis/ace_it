@@ -1,0 +1,75 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% load ace_it_extras %}
+{% block head %}
+<style>
+    .option-selected {
+        color: orange;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        {{ scores }}
+        <div class="row">
+            Number Correct: {{ scores.number_correct }}
+        </div>
+        <div class="row">
+            Number Inorrect: {{ scores.number_incorrect }}
+        </div>
+        <div class="row">
+            Number Omitted: {{ scores.number_omitted }}
+        </div>
+        <div class="row">
+            Percent Correct: {{ scores.percent_correct }}%
+        </div>
+    </div>
+    <div class="container">
+        {% for term in terms %}
+        <div class="row">
+            <div>{{term.number}}. </div><div class="question-row">{{term.question}}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <form action="{% url 'ace_it_test_prep:mcq_results_detail' %}" method="post">
+                {% csrf_token %}
+                <input id="results_form_input" type="hidden" name="results" value="{{results|escapejs}}">
+                <input id="terms_form_input" type="hidden" name="terms" value="{{terms|escapejs}}">
+                <input id="scores_form_input" type="hidden" name="scores" value="{{scores}}">
+                <input id="submit-btn" type="submit" value="View Questions">
+            </form>
+        </div>
+    </div>
+<script>
+    var questionRows = document.querySelectorAll(".question-row")
+    var results = JSON.parse("{{ results|escapejs }}")
+    console.log("questionRows length: ", questionRows.length)
+    console.log("questionRows: ", questionRows)
+    questionRows.forEach(function(questionRow, index) {
+        console.log("results[index]: ", results[index])
+        console.log("questionRow: ", questionRow.style.color)
+        if (results[index]["correct"]) {
+            console.log("correct")
+            questionRow.style.color = "green"
+        } else if (results[index]["omitted"]) {
+            console.log("omitted")
+            questionRow.style.color = "black"
+        } else {
+            console.log("incorrect")
+            questionRow.style.color = "red"
+        }
+    })
+    var resultsFormInput = document.querySelector("#results_form_input")
+    var termsFormInput = document.querySelector("#terms_form_input")
+    var scoresFormInput = document.querySelector("#scores_form_input")
+    var submitBtn = document.querySelector("#submit-btn")
+
+    // submitBtn.addEventListener("click", function() {
+    //     resultsFormInput.value = "{{results}}"
+    //     termsFormInput.value = "{{terms}}"
+    //     scoresFormInput.value = "{{scores}}"
+    // })
+
+</script>
+{% endblock %}

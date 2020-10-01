@@ -34,6 +34,9 @@
   var currentAnswerSelection;
   var answerSelectionHasChanged = false;
   var timeExpired = false;
+  var paginationBtns;
+
+  var eliminatedAnswerOptionsList;
 
 
   function getCookie(cname) {
@@ -71,15 +74,42 @@
 
   window.onload = function () {
     console.log("BIBUYBGVYCYTFYCYTVYTV")
+    
     test_session_id = document.querySelector("#test_session_id").value
     numQuestions = document.querySelector("#question_nums").value
     answers_divs = document.querySelectorAll(".answer_choice")
-    passageDiv = document.querySelector("#passage")
+
+    eliminatedAnswerOptionsList = Array(numQuestions).fill([false, false, false, false, false])
+
+    eliminateOptionBtnGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+
+    eliminateOptionBtnGroup.forEach(function(el, index) {
+      el.addEventListener("click", function() {
+        if (answers_divs[index].classList.contains("eliminated")) {
+          answers_divs[index].classList.remove("eliminated")
+        } else {
+          answers_divs[index].classList.add("eliminated")
+        }
+      })
+    })
+
+    paginationBtns = Array.from(document.querySelectorAll(".page-item"))
+
+    paginationBtns[0].classList.add("active")
+    
     question_id = document.querySelector("#question_id").value
     console.log("QUESTION_ID: ", question_id)
     questionNumber = 1;
     currentQuestionIndex = 0;
     userAnswerSelections = Array.from({length: numQuestions})
+    console.log("passagesB: ", passages)
+
+    if (current_section == 'reading') {
+      passageDiv = document.querySelector("#passage")
+      passageDiv.innerHTML = passages[0]['fields']['text']
+    }
+    
+
     getQuestions();
     setQuestionNumBtns()
     activateAnswerBtns(answers_divs)
@@ -116,8 +146,8 @@
         //   testHasBeenLoaded = true
         // }
         console.log("data: ", data)
-        passages = JSON.parse(data.passages)
-        console.log("passages: ", JSON.parse(passages))
+        // passages = JSON.parse(data.passages)
+        // console.log("passages: ", JSON.parse(passages))
         reset()
       }
     }
@@ -139,7 +169,30 @@
     setNextQuestion(nextQuestion, currentQuestionIndex)
   }
 
+  function resetPaginationBtns() {
+    console.log("reset pagination")
+    paginationBtns.forEach(function(el){
+      el.classList.remove("active")
+    })
+  }
+
   function setNextQuestion(nextQuestion, currentQuestionIndex) {
+    answerOptionsGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+    eliminatedAnswerOptions = answerOptionsGroup.map(function(el, index) {
+      console.log("el: ", el)
+      console.log("el.classList: ", el.classList)
+      if (answers_divs[index].classList.contains("eliminated")) { return true }
+      else { return false }
+    })
+
+    eliminatedAnswerOptionsList[currentQuestionIndex] = eliminatedAnswerOptions
+    console.log("eliminatedAnswerOptionsList[currentQuestionIndex]: ", eliminatedAnswerOptionsList[currentQuestionIndex])
+
+    console.log("eliminatedAnswerOptions: ", eliminatedAnswerOptions)
+    resetPaginationBtns()
+    console.log("nextQuestion.question.number: ", nextQuestion.question.number)
+    console.log("nextQuestion.question.number - 1]: ", paginationBtns[nextQuestion.question.number - 1])
+    paginationBtns[nextQuestion.question.number - 1].classList.add("active")
     answerHasBeenSelected = false;
     questionDiv.innerHTML = nextQuestion.question.question_text
     question_id = nextQuestion.question.id
@@ -148,13 +201,23 @@
     console.log("nextQuestionID****: ", question_id)
 
     if (nextQuestion.question.passage) {
+      
+      passage_id = nextQuestion.question.passage.id 
+      nextPassage = passages.find(function(p) {
+          return p['pk'] == nextQuestion.question.passage
+      });
       console.log("TRUE")
-      console.log(passages)
-      console.log(passages[0])
-      passageDiv.innerHTML = passages[nextQuestion.question.passage - 1]["fields"]["text"]
+      console.log("nextPassage: ", nextPassage)
+      console.log("All passages: ", passages)
+      console.log("passage 0: ", passages[0])
+      
+      // passageDiv.innerHTML = passages[nextQuestion.question.passage - 19]["fields"]["text"]
+      passage_title = document.querySelector("#passage_title")
+      passage_title.innerHTML = "Passage " + Number(nextPassage['fields']['passage_index'] + 1)
+      passageDiv.innerHTML = nextPassage["fields"]["text"]
     }
     setNextAnswers(answersData, currentQuestionIndex);
-    console.log("userAnswerSelections: ", userAnswerSelections)
+    // console.log("userAnswerSelections: ", userAnswerSelections)
   }
 
   function setNextAnswers(answersData, currentQuestionIndex) {
@@ -165,12 +228,21 @@
 
       //***Previsouly selected answer needs to be highlighted when answers are loaded***///
       var previousAnswerSelection = userAnswerSelections[currentQuestionIndex]
-      console.log("userAnswerSelections: ", userAnswerSelections)
-      console.log("currentQuestionIndex: ", currentQuestionIndex, "previousAnswerSelection: ", previousAnswerSelection)
-      console.log("answers_divs[index].id: ", answers_divs[index].id)
+      // console.log("userAnswerSelections: ", userAnswerSelections)
+      // console.log("currentQuestionIndex: ", currentQuestionIndex, "previousAnswerSelection: ", previousAnswerSelection)
+      // console.log("answers_divs[index].id: ", answers_divs[index].id)
       if (previousAnswerSelection == answers_divs[index].id) {
         console.log("TRUE")
         answers_divs[index].classList.add("selected_answer");
+      }
+      console.log("currentQuestionIndex: ", currentQuestionIndex)
+      console.log("eliminatedAnswerOptionsList[currentQuestionIndex][index]: ", eliminatedAnswerOptionsList[currentQuestionIndex][index])
+      if (eliminatedAnswerOptionsList[currentQuestionIndex][index]) {
+        answers_divs[index].classList.add("eliminated")
+        eliminatedAnswerOptionsList[index] = true
+      } else {
+        answers_divs[index].classList.remove("eliminated")
+        eliminatedAnswerOptionsList[index] = false
       }
     });
     return

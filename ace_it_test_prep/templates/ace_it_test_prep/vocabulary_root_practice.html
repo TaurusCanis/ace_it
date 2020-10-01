@@ -1,0 +1,90 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% block content %}
+<div class="container vh-100">
+    <h1>Vocabulary - Roots Practice</h1>
+    <div class="row align-items-center justify-content-center h-50">
+        <div class="card h-100" style="width: 18rem;">
+            <div class="card-body align-items-center h-100" id="term-card">
+                <h5 class="card-title" id="term-div">Card title</h5>
+                <h6 class="card-subtitle mb-2 text-muted" id="definition-div">Card subtitle</h6>   
+            </div>
+            <div class="row justify-content-between">
+                <div class="pl-100" id="back-btn">Back</div>
+                <div id="next-btn">Next</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener("load", function() {
+        var terms = JSON.parse("{{ terms_json|escapejs }}")
+        var termDiv = document.querySelector("#term-div")
+        var definitionDiv = document.querySelector("#definition-div")
+        var index = 0;
+        var termCard = document.querySelector("#term-card")
+
+        definitionDiv.style.display = "none"
+
+        termCard.addEventListener("click", function() {
+            if (definitionDiv.style.display == "none") {
+                definitionDiv.style.display  = "block"
+            } else {
+                definitionDiv.style.display = "none"
+            }
+        })
+
+        // termDiv.addEventListener("click", function() {
+        //     if (this.style.display == "none") {
+        //         alert("click")
+        //         this.style.display = "block"
+        //         definitionDiv.style.display = "none"
+        //     } else {
+        //         this.style.display = "none"
+        //         definitionDiv.style.display = "block"
+        //     }
+        // })
+        // definitionDiv.addEventListener("click", function() {
+        //     if (this.style.display == "none") {
+        //         alert("click")
+        //         this.style.display = "block"
+        //         termDiv.style.display = "none"
+        //     } else {
+        //         this.style.display = "none"
+        //         termDiv.style.display = "block"
+        //     }
+        // })
+
+        var backBtn = document.querySelector("#back-btn")
+        var nextBtn = document.querySelector("#next-btn")
+
+        backBtn.addEventListener("click", function() {
+            if (index == 0) {
+                index = terms.length - 1
+            } else {
+                index--
+            }
+            termDiv.innerHTML = terms[index]["fields"].term
+            definitionDiv.innerHTML = terms[index]["fields"].definition
+            definitionDiv.style.display = "none"
+            termDiv.style.display = "block"
+        })
+
+        nextBtn.addEventListener("click", function() {
+            if (index == terms.length - 1) {
+                index = 0
+            } else {
+                index++
+            }
+            termDiv.innerHTML = terms[index]["fields"].term
+            definitionDiv.innerHTML = terms[index]["fields"].definition
+            definitionDiv.style.display = "none"
+            termDiv.style.display = "block"
+        })
+
+        termDiv.innerHTML = terms[0]["fields"].term
+        definitionDiv.innerHTML = terms[0]["fields"].definition
+        console.log("terms: ", terms)
+    });
+    
+</script>
+{% endblock %}

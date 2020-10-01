@@ -1,0 +1,164 @@
+{% extends "ace_it_test_prep/base.html" %}
+{% load ace_it_extras %}
+{% block head %}
+<style>
+    .option-selected {
+        color: orange;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="container">
+            <div class="row">
+                <div id="question_number">1. </div>
+                <div id="question_text"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            {% for answer_option in terms.answer_options %}
+            <div class="row">
+                <div id="answer_option_letter_{{ forloop.counter }}">{{ forloop.counter|to_char }}. </div>
+                <div id="answer_option_text_{{ forloop.counter }}"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <div class="row">
+                <div id="back_btn">Back</div>
+                <div id="next_btn">Next</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <form action="{% url 'ace_it_test_prep:mcq_submit_section' %}" method="post">
+                {% csrf_token %}
+                <input id="response_object_form_input" type="hidden" name="response_object">
+                <input id="terms_form_input" type="hidden" name="terms">
+                <input id="submit-btn" type="submit">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener("load", function() {
+        var questionData = JSON.parse("{{ terms_json|escapejs }}")
+        var questionNumberDiv = document.querySelector("#question_number")
+        var questionTextDiv = document.querySelector("#question_text")
+        var answerOptionDivs = document.querySelectorAll('[id^="answer_option_letter_"]');
+        var answerTextDivs = document.querySelectorAll('[id^="answer_option_text_"]');
+        var backBtnDiv = document.querySelector("#back_btn")
+        var nextBtnDiv = document.querySelector("#next_btn")
+        var submitBtn = document.querySelector("#submit-btn")
+        var responseObjectFormInput = document.querySelector("#response_object_form_input")
+        var termsFormInput = document.querySelector("#terms_form_input")
+        var questionIndex = 0
+        var responseObject = []
+
+        submitBtn.addEventListener("click", function() {
+            console.log("JSON.stringify(responseObject): ", JSON.stringify(responseObject))
+            responseObjectFormInput.value = JSON.stringify(responseObject)
+            termsFormInput.value = JSON.stringify(questionData)
+        })
+
+        console.log("RESET")
+        for (question of questionData) {
+            responseObject.push(
+                {
+                    "question_id": question.question_id,
+                    "correct_answer": question.correct_answer,
+                    "user_has_selected_option": false,
+                    "user_selection": null
+                }
+            )
+        }
+
+        console.log("responseObject1: ", responseObject)
+
+        setUpQuestion(questionIndex)
+        activateAnswerDivs(questionIndex)
+
+        function setUpQuestion(questionIndex) {
+            loadQuestion(questionIndex)
+            loadAnswers(questionIndex)
+            if (responseObject[questionIndex]["user_has_selected_option"]) {
+                answerTextDivs[responseObject[questionIndex]["user_selection"]].classList.add("option-selected")
+            }
+        }
+
+        next_btn.addEventListener("click", function() {
+            saveAnswerToResponseObject(questionIndex)
+            questionIndex++
+            if (questionIndex == questionData.length) {
+                questionIndex = 0
+            }
+            setUpQuestion(questionIndex)
+        })
+
+        back_btn.addEventListener("click", function() {
+            saveAnswerToResponseObject(questionIndex)
+            if (questionIndex == 0) {
+                questionIndex = questionData.length - 1
+            } else {
+                questionIndex--
+            }
+            setUpQuestion(questionIndex)
+        })
+
+        function loadQuestion(index) {
+            questionNumberDiv.innerHTML = questionData[index]["number"] + ". "
+            questionTextDiv.innerHTML = questionData[index]["question"]
+        }
+
+        function loadAnswers(index) {
+            console.log("responseObject2: ", responseObject)
+            answer_options = questionData[index]["answer_options"]
+            answer_options.forEach(function(answer_option, i) {
+                answerTextDivs[i].innerHTML = answer_option
+            })
+            clearSelections()
+            // if (responseObject[questionIndex]["user_selection"]) {
+            //     answerTextDivs[questionIndex].classList.add("option-selected")
+            // }
+        }
+
+        function activateAnswerDivs(index) {
+            Array.from(answerTextDivs).forEach(function(answerTextDiv, i) {
+                answerTextDiv.addEventListener("click", function() {
+                    previsoulySelectedAnswerDiv = document.querySelector(".option-selected")
+                    console.log("previsoulySelectedAnswerDiv: ", previsoulySelectedAnswerDiv)
+                    clearSelections()
+                    if (previsoulySelectedAnswerDiv != this) {
+                        console.log("NO")
+                        this.classList.add("option-selected")
+                    }
+                })
+            })
+        }
+
+        function clearSelections() {
+            Array.from(answerTextDivs).forEach(function(answerTextDiv, i) {
+                answerTextDiv.classList.remove("option-selected")
+            })
+        }
+
+        function saveAnswerToResponseObject(questionIndex) {
+            selectedAnswerDiv = document.querySelector(".option-selected")
+            if (selectedAnswerDiv) {
+                responseObject[questionIndex]["user_selection"] = Array.from(answerTextDivs).indexOf(selectedAnswerDiv)
+                responseObject[questionIndex]["user_has_selected_option"] = true
+            }
+            console.log("responseObject3: ", responseObject)
+        }
+    })
+
+</script>
+
+{% endblock %}

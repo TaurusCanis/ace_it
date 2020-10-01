@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from .models import Question, Test, TestSession, TestResponse, Answer, VocabularyTerm, ReadingPassage, Section, TestSessionSection, Student, Parent, Instructor, UserProfile, Assignment, AssignmentSession
+from .models import Question, Test, TestSession, TestResponse, Answer, VocabularyTerm, ReadingPassage, Section, TestSessionSection, Student, Parent, Instructor, UserProfile, Assignment, AssignmentSession, VocabularyRoot, VocabularyTermSynonym, VocabularyCentralIdea
 from django.core import serializers
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 import json, random
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.apps import apps
+from django.core import serializers
 
 # Create your views here.
 
@@ -272,6 +273,170 @@ def vocabulary_practice(request):
     print("practice_terms: ", practice_terms)
     return render(request, "ace_it_test_prep/vocabulary_practice.html", context)
 
+def vocabulary_roots_practice(request, root=None):
+    # if root:
+    #     practice_terms = VocabularyTerm.objects.filter(vocabulary_root=root) 
+    #     practice_terms_serialized = serializers.serialize("json", practice_terms)
+    #     first_term = practice_terms[0]
+    #     print("first_term: ", first_term)
+    #     context = {
+    #         "first_term": first_term,
+    #         "terms_json": practice_terms_serialized
+    #     }
+    #     print("context: ", context)
+    #     return render(request, "ace_it_test_prep/vocabulary_flashcards.html", context)
+    # else:
+    #     roots = VocabularyRoot.objects.all()
+    #     context = {
+    #         "roots": roots
+    #     }
+    #     return render(request, "ace_it_test_prep/vocabulary_roots_options_overview.html", context)
+
+    practice_terms = VocabularyRoot.objects.all()
+    practice_terms_serialized = serializers.serialize("json", practice_terms)
+    first_term = practice_terms[0]
+    print("first_term: ", first_term)
+    context = {
+        "first_term": first_term,
+        "terms_json": practice_terms_serialized
+    }
+    print("context: ", context)
+    return render(request, "ace_it_test_prep/vocabulary_flashcards.html", context)
+
+def vocabulary_derivatives_practice(request, root=None):
+    print("DERIVATIVES PRACTICE")
+    if root:
+        print("IF")
+        practice_terms = VocabularyTerm.objects.filter(vocabulary_root_id=root) 
+        practice_terms_serialized = serializers.serialize("json", practice_terms)
+        first_term = practice_terms[0]
+        print("first_term: ", first_term)
+        context = {
+            "first_term": first_term,
+            "terms_json": practice_terms_serialized
+        }
+        print("context: ", context)
+        return render(request, "ace_it_test_prep/vocabulary_flashcards.html", context)
+    else:
+        print("ELSE")
+        roots = VocabularyRoot.objects.exclude(vocabularyterm=None)
+        context = {
+            "roots": roots
+        }
+        return render(request, "ace_it_test_prep/vocabulary_roots_options_overview.html", context)
+    
+
+def vocabulary_roots_practice_synonyms(request):
+    # num_entities = VocabularyTermSynonym.objects.all().count()
+    # rand_entities = random.sample(range(num_entities), 10)
+    # sample_entities = VocabularyTermSynonym.objects.filter(id__in=rand_entities)
+    synonyms = VocabularyTermSynonym.objects.all()
+    synonyms_list = []
+    number = 1
+
+    for synonym in synonyms:
+
+        new_synonym = {
+            "question": synonym.term.term,
+            "question_id": synonym.id,
+            "number": number,
+            "answer_options": [
+                synonym.option_a,
+                synonym.option_b,
+                synonym.option_c,
+                synonym.option_d,
+                synonym.option_e,
+            ],
+            "correct_answer": synonym.correct_answer
+        }
+        synonyms_list.append(new_synonym)
+        number += 1
+
+    context = { "terms": new_synonym, "terms_json": json.dumps(synonyms_list) }
+    print("context: ", context)
+    return render(request, "ace_it_test_prep/mcq.html", context)
+
+def vocabulary_by_category(request, category=None):
+    if category:
+        practice_terms = VocabularyTerm.objects.filter(vocabulary_central_idea__idea_name=category)
+        practice_terms_serialized = serializers.serialize("json", practice_terms)
+        first_term = practice_terms[0]
+        print("first_term: ", first_term)
+        context = {
+            "first_term": first_term,
+            "terms_json": practice_terms_serialized
+        }
+        print("context: ", context)
+        return render(request, "ace_it_test_prep/vocabulary_flashcards.html", context)
+    else:
+        categories = VocabularyCentralIdea.objects.all()
+        context = {
+            "categories": categories
+        }
+        return render(request, "ace_it_test_prep/vocabulary_options_overview.html", context)
+
+def vocabulary_flashcards_overview(request):
+    return render(request, "ace_it_test_prep/vocabulary_flashcards_overview.html")
+
+# def mcq_section(request):
+#     practice_set_id = request.POST.get("practice_set_id")
+
+
+def mcq_submit_section(request):
+    response_object = json.loads(request.POST.get('response_object'))
+    json_terms = request.POST.get('terms')
+    terms = json.loads(json_terms)
+    print("terms: ", terms)
+    score_section_response = score_section(response_object, terms)
+    results = score_section_response[0]
+    scores = score_section_response[1]
+    context = { 'results': results, 'terms': terms, "json_terms": json_terms, "scores": scores }
+    print("context: ", context)
+    # print("scores: ", scores)
+    return render(request, "ace_it_test_prep/mcq_results_overview.html", context)
+
+def score_section(response_object, terms):
+    results = response_object
+    number_correct = 0
+    number_incorrect = 0
+    number_omitted = 0
+    for index, res in enumerate(results):
+        print("res['user_selection']: ", res['user_selection'])
+        print("res['correct_answer']: ", res['correct_answer'])
+        if res['user_selection'] == terms[index]["answer_options"].index(res['correct_answer']):
+            res["correct"] = True
+            res["omitted"] = False
+            number_correct+=1
+        elif res['user_selection'] == None:
+            res["correct"] = False
+            res["omitted"] = True
+            number_omitted+=1
+        else:
+            res["correct"] = False
+            res["omitted"] = False
+            number_incorrect+=1
+    score = dict(
+        number_correct = number_correct,
+        number_incorrect = number_incorrect,
+        number_omitted = number_omitted,
+        percent_correct = (number_correct / len(results)) * 100
+    )
+    
+    return (json.dumps(results), score)
+
+def mcq_results_detail(request):
+    results = request.POST.get("results") 
+    terms = request.POST.get("terms") 
+    scores = request.POST.get("scores") 
+    print("results: ", results)
+    print("terms: ", terms)
+    print("scores: ", scores)
+    context = {
+        "terms": json.loads(terms)
+    }
+    print("CONTEXT: ", context["terms"][0])
+    return render(request, "ace_it_test_prep/mcq_results_detail.html", context)
+
 def test_synonyms(request):
     print("data: ", request.POST.get("serialized_data"))
     test_synonyms_data = json.loads(request.POST.get("serialized_data"))
@@ -474,6 +639,7 @@ def practice_test(request, test_id, section):
     print("section: ", section)
     test = Test.objects.get(id=test_id)
     section=Section.objects.get(name=section)
+    print("section: ", section)
     test_session, session_created = TestSession.objects.get_or_create(user=request.user, test=test)
     test_session_section, session_section_created = TestSessionSection.objects.get_or_create(
         test_session=test_session,
@@ -486,12 +652,22 @@ def practice_test(request, test_id, section):
     all_questions = Question.objects.filter(test=test_session.test).order_by("number")
     section_questions = all_questions.filter(section=section)
     section_questions_num = section_questions.count()
-    print("section_questions: ", section_questions)
-    print("questions.values_list('id', flat=True): ", list(section_questions.values_list('id', flat=True)))
-    passage_ids = list(section_questions.values_list('passage__id', flat=True))
-    print("passage_ids: ", passage_ids, " passage_ids_type: ", type(passage_ids))
-    passages = ReadingPassage.objects.filter(id__in=passage_ids)
-    print("passages: ", passages)
+    # print("section_questions: ", section_questions)
+    # print("questions.values_list('id', flat=True): ", list(section_questions.values_list('id', flat=True)))
+    
+    
+    if section.name == "reading":
+        print("READING")
+        passage_ids = list(section_questions.values_list('passage__id', flat=True))
+        # print("passage_ids: ", passage_ids, " passage_ids_type: ", type(passage_ids))
+        passages = ReadingPassage.objects.filter(id__in=passage_ids)
+        # print("passages: ", passages)
+        serialized_passages = json.dumps(serializers.serialize("json", passages))
+        # print("serialized_passages: ", serialized_passages)
+        # print("serialized_passages: ", json.dumps(serialized_passages))
+    else:
+        print("NOT Reading")
+        serialized_passages = "null"      
 
     #moved to practice_test_detail
     # if session_created:
@@ -512,15 +688,18 @@ def practice_test(request, test_id, section):
             assignment.save()
 
 
-    print("data: ", data)
+    # print("data: ", data)
     context = {
         "test_session_id": test_session.id,
         "data": data,
         "question_nums_range": range(section_questions_num),
         "question_nums": section_questions_num,
         "section": section,
-        "passages": passages,
-        "time_limit": section.time_limit
+        # "passages": passages,
+        "passages": serialized_passages,
+        # "passages": "passages",
+        "time_limit": section.time_limit,
+        "testing": "testing***"
     }
 
     # print("pratice_test context: ", context)
@@ -528,10 +707,24 @@ def practice_test(request, test_id, section):
     return render(request, "ace_it_test_prep/practice_test.html", context)
 
 def get_answers(questions):
+    questions_values = questions.values()
+    # print("questions_values: ", questions_values[0])
+    # for question in questions_values:
+        # print("question: ", question)
+        # answers = question.answer_set.all()
+        # print("answers: ", answer)
     data = []
     if isinstance(questions, QuerySet):
         for question in questions:
             answers_list = format_answers(question.answer_set.all())
+            # print("answers_list: ", answers_list)
+            if question.question_type is None:
+                question.question_type = "None"
+            # if question.passage is None:
+            #     print("NO PASSAGE")
+            #     question.passage = "None"
+            if question.diagram_src is None:
+                question.diagram_src = "None"
             data.append({ "question": model_to_dict(question), "answers": answers_list })
     else:
         answers_list = format_answers(questions.answer_set.all())
@@ -541,7 +734,12 @@ def get_answers(questions):
 def format_answers(answers):
     answers_list = []
     for answer in answers:
+        # print("ANSWER: ", answer.num_students_choice)
+        if answer.num_students_choice is None:
+            answer.num_students_choice = 0
+        # print("ANSWER: ", answer.num_students_choice)
         answers_list.append(model_to_dict(answer))
+    # print("answers_list: ", answers_list)
     return answers_list
 
 # def create_test_session(user, test):
@@ -801,6 +999,10 @@ def practice_test_results(request, test_session_id, section=None):
     #     'questions': questions
     # }
 
+    num_correct = user_answers.filter(correct = True).count()
+    num_incorrect = user_answers.filter(correct = False).count()
+    num_omitted = user_answers.filter(answered = False).count()
+
     user_profile = UserProfile.objects.get(user=request.user)
 
     print("user_profile: ", user_profile.user_type)
@@ -816,7 +1018,10 @@ def practice_test_results(request, test_session_id, section=None):
         'zipped_data': zipped_data,
         "test_session_id": test_session.id,
         "test_id": test_id,
-        "student": student
+        "student": student,
+        "num_correct": num_correct,
+        "num_incorrect": num_incorrect,
+        "num_omitted": num_omitted
     }
     # for ans, q in zipped_data:
     #     print("question_id: ", q.id, "question_text: ", q.question_text)

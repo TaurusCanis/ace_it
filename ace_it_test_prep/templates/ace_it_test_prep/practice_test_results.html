@@ -15,75 +15,97 @@
 
 {% endblock %}
 {% block content %}
-
-<div>
-  <a id="pracrice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=test_session_id %}">Back to Results Overview</a>
+<div class="container">
+  <div class="row">
+    <a id="pracrice_test_link" href="{% url 'ace_it_test_prep:practice_test_results_overview' test_session_id=test_session_id %}">Back to Results Overview</a>
+  </div>
+  <div class="row">
+    Student Name: {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
+  </div>
+  <div class="row">
+    <div class="container border rounded mt-2">
+      <div class="row">
+        Correctly Answered: {{ num_correct }}
+      </div>
+      <div class="row">
+        Inorrectly Answered: {{ num_incorrect }}
+      </div>
+      <div class="row">
+        Omitted: {{ omitted }}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="container">
+      <table class="table">
+        <div class="row">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Question</th>
+              <th>Your Answer</th>
+              <th>Correct Answer</th>
+            </tr>
+          </thead>
+        </div>
+      {% for test_response, question in zipped_data %}
+      <div class="row">
+        <tr {% if test_response.correct is False %}class="table-danger"{% elif test_response.correct is True %}class="table-success"{%elif test_response.answered is False%}class="table-warning"{% endif %}>
+          <td>{{ question.number }}</td>
+          <td>{{ question.question }}</td>
+          <td>
+            {% if test_response.response == 0 %}
+              A. {{ question.option_a }}
+            {% elif test_response.response == 1 %}
+              B. {{ question.option_b }}
+            {% elif test_response.response == 2 %}
+              C. {{ question.option_c }}
+            {% elif test_response.response == 3 %}
+              D. {{ question.option_d }}
+            {% elif question.correct_answer == '4' %}
+              E. {{ question.option_d }}
+            {% else %}
+              Not Answered
+            {% endif %}
+          </td>
+          <td>
+            {% if question.correct_answer == '0' %}
+              A. {{ question.option_a }}
+            {% elif question.correct_answer == '1' %}
+              B. {{ question.option_b }}
+            {% elif question.correct_answer == '2' %}
+              C. {{ question.option_c }}
+            {% elif question.correct_answer == '3' %}
+              D. {{ question.option_d }}
+            {% elif question.correct_answer == '4' %}
+              E. {{ question.option_d }}
+            {% else %}
+              Not Answered
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+              {% csrf_token %}
+              <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
+              <input type="hidden" value="{{ question.id }}" name="question_id">
+              <button class="btn btn-info" type="submit">View Question</button>
+            </form>
+          </td>
+        </tr>
+      </div>
+        
+      {% endfor %}
+      </table>
+  
+    </div>
+    
+  </div>
 </div>
 
-<div>
-  Student Name: {{ student.user_profile.user.first_name }} {{ student.user_profile.user.last_name }}
-</div>
 
 
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Question</th>
-      <th>Your Answer</th>
-      <th>Correct Answer</th>
-    </tr>
-  </thead>
-  <h1>The answers should be here</h1>
 
 
-{% for test_response, question in zipped_data %}
 
-  <tr {% if test_response.correct is False %}class="wrong"{% endif %}>
-    <td>{{ question.number }}</td>
-    <td>{{ question.question }}</td>
-    <td>
-      {% if test_response.response == 0 %}
-        A. {{ question.option_a }}
-      {% elif test_response.response == 1 %}
-        B. {{ question.option_b }}
-      {% elif test_response.response == 2 %}
-        C. {{ question.option_c }}
-      {% elif test_response.response == 3 %}
-        D. {{ question.option_d }}
-      {% elif question.correct_answer == '4' %}
-        E. {{ question.option_d }}
-      {% else %}
-        Not Answered
-      {% endif %}
-    </td>
-    <td>
-      {% if question.correct_answer == '0' %}
-        A. {{ question.option_a }}
-      {% elif question.correct_answer == '1' %}
-        B. {{ question.option_b }}
-      {% elif question.correct_answer == '2' %}
-        C. {{ question.option_c }}
-      {% elif question.correct_answer == '3' %}
-        D. {{ question.option_d }}
-      {% elif question.correct_answer == '4' %}
-        E. {{ question.option_d }}
-      {% else %}
-        Not Answered
-      {% endif %}
-    </td>
-    <td>
-      {{ test_response.id }}
-      {{ question.id }}
-      <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
-        {% csrf_token %}
-        <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
-        <input type="hidden" value="{{ question.id }}" name="question_id">
-        <button type="submit">Detail</button>
-      </form>
-    </td>
-  </tr>
-{% endfor %}
-</table>
 
 {% endblock %}

@@ -124,6 +124,7 @@ class SSATReadingQuestion(models.Model):
 class ReadingPassage(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     text = models.CharField(max_length=10000)
+    passage_index = models.IntegerField()
 
 class SSATVerbalQuestion(models.Model):
     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
@@ -187,7 +188,65 @@ class TestResponse(models.Model):
 
 class VocabularyTerm(models.Model):
     term = models.CharField(max_length=100)
-    part_of_speech = models.CharField(max_length=20)
-    synonyms_list = models.CharField(max_length=200)
-    # definition = models.CharField(max_length=500)
-    example = models.CharField(max_length=1000)
+    part_of_speech = models.CharField(max_length=20, blank=True)
+    synonyms_list = models.CharField(max_length=200, blank=True)
+    vocabulary_root = models.ForeignKey("VocabularyRoot", on_delete=models.CASCADE, blank=True, null=True)
+    vocabulary_central_idea = models.ForeignKey("VocabularyCentralIdea", on_delete=models.CASCADE, blank=True, null=True)
+    definition = models.CharField(max_length=500, blank=True)
+    example = models.CharField(max_length=1000, blank=True)
+
+    def __str__(self):
+        return self.term
+
+class VocabularySet(models.Model):
+    source = models.CharField(max_length=100)
+
+class VocabularyRoot(models.Model):
+    root_type = models.CharField(choices=[("P", "Prefix"), ("R", "Root"), ("S", "Suffix")], max_length=1)
+    term = models.CharField(max_length=100)
+    definition = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.term
+
+class VocabularyTermSynonym(models.Model):
+    term = models.ForeignKey(VocabularyTerm, on_delete=models.CASCADE)
+    option_a = models.CharField(max_length=100)
+    option_b = models.CharField(max_length=100)
+    option_c = models.CharField(max_length=100)
+    option_d = models.CharField(max_length=100)
+    option_e = models.CharField(max_length=100, blank=True, null=True)
+    correct_answer = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.term.term
+
+    def natural_key(self):
+        return self.term.term
+
+class PracticeSet(models.Model):
+    section = models.CharField(max_length=200)
+    sub_section = models.CharField(max_length=200)
+    sub_section_category = models.CharField(max_length=200)
+
+class PracticeSetQuestion(models.Model):
+    question = models.CharField(max_length=10000)
+    diagram = models.CharField(max_length=10000, blank=True, null=True)
+    passage = models.CharField(max_length=10000, blank=True, null=True)
+    extra_info_text = models.CharField(max_length=10000, blank=True, null=True)
+    option_a = models.CharField(max_length=300)
+    option_b = models.CharField(max_length=300)
+    option_c = models.CharField(max_length=300)
+    option_d = models.CharField(max_length=300)
+    option_e = models.CharField(max_length=300, blank=True, null=True)
+    correct_answer = models.CharField(max_length=300)
+    category_1 = models.CharField(max_length=300)
+    category_2 = models.CharField(max_length=300)
+
+class VocabularyCentralIdea(models.Model):
+    idea_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.idea_name
+    
+

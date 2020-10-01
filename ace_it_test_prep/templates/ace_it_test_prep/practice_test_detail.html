@@ -7,21 +7,49 @@
 
 {% endblock %}
 {% block content %}
-  <h1>Practice Test 1</h1>
-  <div>
-    Student Name: {{ user.first_name }} {{ user.last_name }}
+<div class="container">
+  <div class="row">
+    <h1 class="text-center">Practice Test 1</h1>
   </div>
-  <div class="container">
-    {% for section_data in sections_data %}
-    <div class="test_section">
-      {% if section_data.completed %}
-        View Results
-        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=section_data.section %}">{{section_data.section}}</a>
-      {% else %}
-        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_start_page' id=test_id section=section_data.section %}">{{section_data.section}}</a>
-      {% endif %}
+  <div class="row text-center">
+    {{ user.first_name }} {{ user.last_name }}
+  </div>
+  <div class="row">
+    <div class="container border rounded my-3">
+      {% for section_data in sections_data %}
+      <div class="test_section row py-1 px-2">
+        {% if section_data.completed %}
+          <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=section_data.section %}">
+            {% if section_data.section == 'math_1' %}
+              Math 1
+            {% elif section_data.section == 'math_2' %}
+              Math 2
+            {% elif section_data.section == 'verbal' %}
+              Verbal
+            {% elif section_data.section == 'reading' %}
+              Reading
+            {% endif %}
+             - View Results
+          </a>
+        {% else %}
+          <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_start_page' id=test_id section=section_data.section %}">
+            {% if section_data.section == 'math_1' %}
+            Math 1
+          {% elif section_data.section == 'math_2' %}
+            Math 2
+          {% elif section_data.section == 'verbal' %}
+            Verbal
+          {% elif section_data.section == 'reading' %}
+            Reading
+          {% endif %}
+          </a>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
+
+</div>
+  
 
 {% endblock %}
