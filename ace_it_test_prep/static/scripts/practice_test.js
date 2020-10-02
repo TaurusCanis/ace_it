@@ -1,45 +1,10 @@
-  var nextBtn = document.getElementById("next-btn");
-  var backBtn = document.getElementById("back-btn");
-  var num = document.getElementById("num");
-  var questionDiv = document.getElementById("question");
-  var questionNums = document.getElementById("question-nums");
-  var testId = document.getElementById("test_id");
-  // var pauseSession = document.querySelector("#pause-session");
-  var test_section = document.getElementById("section");
-  var columnA = document.getElementById("option_column_a");
-  var columnB = document.getElementById("option_column_b");
-  var sessionId = document.querySelector("#session_id");
-  var submit_test = document.querySelector("#submit_test");
+var userAnswerSelections;
+var eliminatedAnswerOptionsList;
+var currentQuestionIndex;
+var answerHasBeenSelected;
+var numQuestions;
 
-  var numQuestions;
-  var questions = "QUESTIONS";
-  var currentQuestionNum = 1;
-  var currentQuestionIndex = 0;
-  var answer_options_container = document.querySelector(".answer_options_container");
-  var userAnswerSelections;
-  var answerHasBeenSelected = false;
-  var answerSelectionIsNew = false;
-  var test_session_id;
-  var testHasBeenLoaded = false;
-  var question_data;
-  var passages;
-  var passageDiv;
-
-  var test_id;
-  var question_id;
-  var test_session;
-  var section;
-  var context;
-  var answerSelection;
-  var currentAnswerSelection;
-  var answerSelectionHasChanged = false;
-  var timeExpired = false;
-  var paginationBtns;
-
-  var eliminatedAnswerOptionsList;
-
-
-  function getCookie(cname) {
+ function getCookie(cname) {
       var name = cname + "=";
       var decodedCookie = decodeURIComponent(document.cookie);
       var ca = decodedCookie.split(';');
@@ -71,18 +36,107 @@
     document.head.appendChild(script);
   })();
 
+  function setupPage() {
 
-  window.onload = function () {
-    console.log("BIBUYBGVYCYTFYCYTVYTV")
+    // ----------- VARIABLE ASSIGNMENT -----------------
+
+    // var pauseSession = document.querySelector("#pause-session");
+
+    // test and session meta data
+    var testId = document.getElementById("test_id");
+    var test_section = document.getElementById("section");
+    // var sessionId = document.querySelector("#session_id");
+    var test_session_id = document.querySelector("#test_session_id").value
+
+    // question metadata
+    // var questionNums = document.getElementById("question-nums");
+    numQuestions = Number(document.querySelector("#question_nums").value)
+    var question_id = Number(document.querySelector("#question_id").value)
+    var questionNumber = 1;
+    currentQuestionIndex = 0;
+
+    // next, back, and submit direction buttons - bottom of page
+    var nextBtn = document.getElementById("next-btn");
+    var backBtn = document.getElementById("back-btn");
+    var submit_test = document.querySelector("#submit_test");
+
+    // question number, text, and answers
+    var num = document.getElementById("num");
+    var questionDiv = document.getElementById("question");
+    // var answers_divs = document.querySelectorAll(".answer_choice")
     
-    test_session_id = document.querySelector("#test_session_id").value
-    numQuestions = document.querySelector("#question_nums").value
-    answers_divs = document.querySelectorAll(".answer_choice")
 
-    eliminatedAnswerOptionsList = Array(numQuestions).fill([false, false, false, false, false])
+    // not used for SSAT (quantitative comparisons)
+    // var columnA = document.getElementById("option_column_a");
+    // var columnB = document.getElementById("option_column_b");
 
-    eliminateOptionBtnGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+    // initialize array of length of number of questions.
+    // each index contains an array of length of answers options each of which is set to 'false'.
+    // this is used to monitor options user has 'eliminated' for each question
+    
+    eliminatedListInitialSingle = [false, false, false, false, false]
+    eliminatedAnswerOptionsList = []
 
+    for (i = 0; i < numQuestions; i++) {
+      console.log("eliminatedListInitialSingle type: ", Array.isArray(eliminatedListInitialSingle))
+      eliminatedAnswerOptionsList[i] = new Array(false, false, false, false, false)
+      // eliminatedListInitialSingle.forEach(function(el, index) {
+      //   eliminatedAnswerOptionsList[i][index] = el
+      // })
+    }
+
+    // var eliminateOptionBtnGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+    userAnswerSelections = Array.from({length: numQuestions})
+    answerHasBeenSelected = false;
+
+    // set first pagination button to active
+    var paginationBtns = Array.from(document.querySelectorAll(".page-item"))
+
+    
+
+
+    // setEliminatedAnswers(eliminateOptionBtnGroup, answers_divs)
+    setEliminatedAnswers()
+    resetPaginationBtns(currentQuestionIndex)
+    // getQuestions();
+    console.log("userAnswerSelections5: ", userAnswerSelections)
+    setQuestionNumBtns()
+    // activateAnswerBtns(answers_divs)
+    activateAnswerBtns(answerHasBeenSelected, userAnswerSelections)
+    // activateDirectionalBtns(currentQuestionIndex, answerHasBeenSelected, numQuestions, userAnswerSelections)
+    reset()
+
+    var questions = "QUESTIONS";
+    var currentQuestionNum = 1;
+    // var currentQuestionIndex = 0;
+    var answer_options_container = document.querySelector(".answer_options_container");
+    // var userAnswerSelections;
+    
+    var answerSelectionIsNew = false;
+    var test_session_id;
+    var testHasBeenLoaded = false;
+    var question_data;
+    var passages;
+    var passageDiv;
+  
+    var test_id;
+    var question_id;
+    var test_session;
+    var section;
+    var context;
+    var answerSelection;
+    var currentAnswerSelection;
+    var answerSelectionHasChanged = false;
+    var timeExpired = false;
+    var paginationBtns;
+  
+  }
+
+  // function setEliminatedAnswers(eliminateOptionBtnGroup, answers_divs){
+  function setEliminatedAnswers(){
+    var answers_divs = document.querySelectorAll(".answer_choice")
+    var eliminateOptionBtnGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+    
     eliminateOptionBtnGroup.forEach(function(el, index) {
       el.addEventListener("click", function() {
         if (answers_divs[index].classList.contains("eliminated")) {
@@ -92,68 +146,25 @@
         }
       })
     })
-
-    paginationBtns = Array.from(document.querySelectorAll(".page-item"))
-
-    paginationBtns[0].classList.add("active")
-    
-    question_id = document.querySelector("#question_id").value
-    console.log("QUESTION_ID: ", question_id)
-    questionNumber = 1;
-    currentQuestionIndex = 0;
-    userAnswerSelections = Array.from({length: numQuestions})
-    console.log("passagesB: ", passages)
-
-    if (current_section == 'reading') {
-      passageDiv = document.querySelector("#passage")
-      passageDiv.innerHTML = passages[0]['fields']['text']
-    }
-    
-
-    getQuestions();
-    setQuestionNumBtns()
-    activateAnswerBtns(answers_divs)
-    reset()
   }
 
-  function getQuestions() {
-    var xhr = new XMLHttpRequest();
-    var csrftoken = getCookie('csrftoken');
-    var method = "POST";
-    var url = "../../get_questions"
-    var section = document.querySelector("#section")
-    console.log("section: ", section)
-
-    post_data = JSON.stringify({
-      test_session_id: test_session_id,
-      section: section.value
+  function resetPaginationBtns(currentQuestionIndex) {
+    var paginationBtns = Array.from(document.querySelectorAll(".page-item"))
+    paginationBtns.forEach(function(el){
+      el.classList.remove("active")
     })
+    paginationBtns[currentQuestionIndex].classList.add("active")
+  }
 
-    xhr.open(method, url);
 
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    xhr.send(post_data);
-
-    xhr.onload = function() {
-
-      if (xhr.readyState == 4 && xhr.status == 200) {
-        // console.log("response: ", xhr.response)
-        data = JSON.parse(xhr.response)
-        question_data = data.data
-        // if (!testHasBeenLoaded) {
-        //   userAnswerSelections = Array.apply(null, Array(numQuestions)).map(function () {})
-        //   testHasBeenLoaded = true
-        // }
-        console.log("data: ", data)
-        // passages = JSON.parse(data.passages)
-        // console.log("passages: ", JSON.parse(passages))
-        reset()
-      }
-    }
+  function setReadingPassage(passageDiv, passage_index) {
+    console.log("passage_id: ", passage_index)
+    console.log("passages: ", passages[0]['fields'])
+    passageDiv.innerHTML = passages[passage_index]['fields']['text']
   }
 
   function setQuestionNumBtns() {
+    saveAnswer(currentQuestionIndex)
     questionNumBtns = document.querySelectorAll(".question_num_btn")
     questionNumBtns.forEach((btn, index) => {
       btn.addEventListener("click", function() {
@@ -164,41 +175,37 @@
   }
 
   function getNextQuestion(questionIndex) {
-    nextQuestion = question_data[questionIndex]
+    console.log("eliminatedAnswerOptionsList*******: ", eliminatedAnswerOptionsList[currentQuestionIndex])
+    console.log("eliminatedAnswerOptionsList!!!!! ", eliminatedAnswerOptionsList)
+    nextQuestion = data[questionIndex]
     currentQuestionIndex = questionIndex
     setNextQuestion(nextQuestion, currentQuestionIndex)
+    console.log("currentQuestionIndex: ", currentQuestionIndex)
   }
 
-  function resetPaginationBtns() {
-    console.log("reset pagination")
-    paginationBtns.forEach(function(el){
-      el.classList.remove("active")
-    })
+  function reset() {
+    MathJax.texReset();
+    MathJax.typesetClear();
+    MathJax.typeset();
   }
 
   function setNextQuestion(nextQuestion, currentQuestionIndex) {
     answerOptionsGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
+    answers_divs = document.querySelectorAll(".answer_choice")
     eliminatedAnswerOptions = answerOptionsGroup.map(function(el, index) {
-      console.log("el: ", el)
-      console.log("el.classList: ", el.classList)
       if (answers_divs[index].classList.contains("eliminated")) { return true }
       else { return false }
     })
 
-    eliminatedAnswerOptionsList[currentQuestionIndex] = eliminatedAnswerOptions
-    console.log("eliminatedAnswerOptionsList[currentQuestionIndex]: ", eliminatedAnswerOptionsList[currentQuestionIndex])
+    // eliminatedAnswerOptionsList[currentQuestionIndex] = eliminatedAnswerOptions
 
-    console.log("eliminatedAnswerOptions: ", eliminatedAnswerOptions)
-    resetPaginationBtns()
-    console.log("nextQuestion.question.number: ", nextQuestion.question.number)
-    console.log("nextQuestion.question.number - 1]: ", paginationBtns[nextQuestion.question.number - 1])
-    paginationBtns[nextQuestion.question.number - 1].classList.add("active")
+    resetPaginationBtns(nextQuestion.question.number - 1)
     answerHasBeenSelected = false;
-    questionDiv.innerHTML = nextQuestion.question.question_text
+    document.querySelector("#question").innerHTML = nextQuestion.question.question_text
+
     question_id = nextQuestion.question.id
-    num.innerHTML = nextQuestion.question.number + ". "
-    answersData = nextQuestion.answers
-    console.log("nextQuestionID****: ", question_id)
+    document.querySelector("#num").innerHTML = nextQuestion.question.number + ". "
+    var answersData = nextQuestion.answers
 
     if (nextQuestion.question.passage) {
       
@@ -206,21 +213,17 @@
       nextPassage = passages.find(function(p) {
           return p['pk'] == nextQuestion.question.passage
       });
-      console.log("TRUE")
-      console.log("nextPassage: ", nextPassage)
-      console.log("All passages: ", passages)
-      console.log("passage 0: ", passages[0])
       
       // passageDiv.innerHTML = passages[nextQuestion.question.passage - 19]["fields"]["text"]
       passage_title = document.querySelector("#passage_title")
       passage_title.innerHTML = "Passage " + Number(nextPassage['fields']['passage_index'] + 1)
-      passageDiv.innerHTML = nextPassage["fields"]["text"]
+      document.querySelector("#passage").innerHTML = nextPassage["fields"]["text"]
     }
     setNextAnswers(answersData, currentQuestionIndex);
-    // console.log("userAnswerSelections: ", userAnswerSelections)
   }
 
   function setNextAnswers(answersData, currentQuestionIndex) {
+    console.log("userAnswerSelections1: ", userAnswerSelections)
     resetAnswerColors(answers_divs)
     answersData.forEach((answer, index) => {
       answers_divs[index].innerHTML = String.fromCharCode(65 + index) + ". " + answer.option
@@ -235,20 +238,78 @@
         console.log("TRUE")
         answers_divs[index].classList.add("selected_answer");
       }
-      console.log("currentQuestionIndex: ", currentQuestionIndex)
-      console.log("eliminatedAnswerOptionsList[currentQuestionIndex][index]: ", eliminatedAnswerOptionsList[currentQuestionIndex][index])
-      if (eliminatedAnswerOptionsList[currentQuestionIndex][index]) {
+     if (eliminatedAnswerOptionsList[currentQuestionIndex][index]) {
         answers_divs[index].classList.add("eliminated")
-        eliminatedAnswerOptionsList[index] = true
+        // eliminatedAnswerOptionsList[currentQuestionIndex][index] = true
       } else {
         answers_divs[index].classList.remove("eliminated")
-        eliminatedAnswerOptionsList[index] = false
+        // eliminatedAnswerOptionsList[currentQuestionIndex][index] = false
       }
     });
     return
   }
 
-  function activateAnswerBtns(answerOptions) {
+
+  window.onload = function () {
+    setupPage();
+    if (current_section == 'reading') {
+      this.console.log("reading")
+      var passageDiv = document.querySelector("#passage")
+      console.log(passages[0]['fields']['passage_index'])
+      setReadingPassage(passageDiv, passages[0]['fields']['passage_index'])
+    }
+  }
+
+  // function getQuestions() {
+  //   var xhr = new XMLHttpRequest();
+  //   var csrftoken = getCookie('csrftoken');
+  //   var method = "POST";
+  //   var url = "../../get_questions"
+  //   var section = document.querySelector("#section")
+  //   console.log("section: ", section)
+
+  //   post_data = JSON.stringify({
+  //     test_session_id: test_session_id,
+  //     section: section.value
+  //   })
+
+  //   xhr.open(method, url);
+
+  //   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  //   xhr.setRequestHeader("X-CSRFToken", csrftoken);
+  //   xhr.send(post_data);
+
+  //   xhr.onload = function() {
+
+  //     if (xhr.readyState == 4 && xhr.status == 200) {
+  //       // console.log("response: ", xhr.response)
+  //       data = JSON.parse(xhr.response)
+  //       question_data = data.data
+  //       // if (!testHasBeenLoaded) {
+  //       //   userAnswerSelections = Array.apply(null, Array(numQuestions)).map(function () {})
+  //       //   testHasBeenLoaded = true
+  //       // }
+  //       console.log("data: ", data)
+  //       // passages = JSON.parse(data.passages)
+  //       // console.log("passages: ", JSON.parse(passages))
+  //       reset()
+  //     }
+  //   }
+  // }
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  // function activateAnswerBtns(answerOptions) {
+  function activateAnswerBtns(answerHasBeenSelected, userAnswerSelections) {
+    answerOptions = document.querySelectorAll(".answer_choice")
     answerOptions.forEach(function(answerOption) {
       answerOption.addEventListener("click", function(e) {
         if (answerOption.classList.contains("selected_answer")) {
@@ -286,39 +347,62 @@
     console.log("answerOptions: ", answerOptions)
   }
 
-  nextBtn.addEventListener("click", function() {
-    checkForNewAnswerSelection(currentQuestionIndex)
-    console.log("answerHasBeenSelected: ", answerHasBeenSelected)
-    if (answerHasBeenSelected) {
-      console.log("SELECTED")
-      userAnswerSelections[currentQuestionIndex] = document.querySelector(".selected_answer").id
-      saveAnswer(currentQuestionIndex);
-    }
-    nextQuestionIndex = currentQuestionIndex + 1
-    console.log("numQuestions: ", numQuestions)
-    console.log("nextQuestionIndex: ", nextQuestionIndex)
-    console.log("(nextQuestionIndex == numQuestions - 1): ", (nextQuestionIndex == numQuestions - 1))
-    if (nextQuestionIndex == numQuestions) {
-      nextQuestionIndex = 0;
-    }
-    console.log("nextQuestionIndex: ", nextQuestionIndex)
-    getNextQuestion(nextQuestionIndex)
-    reset();
-  })
+  // function activateDirectionalBtns(currentQuestionIndex, answerHasBeenSelected, numQuestions, userAnswerSelections) {
+    nextBtn = document.getElementById("next-btn");
+    backBtn = document.getElementById("back-btn");
+    nextBtn.addEventListener("click", function() {
+      checkForNewAnswerSelection(currentQuestionIndex)
+      console.log("answerHasBeenSelected: ", answerHasBeenSelected)
+      saveEliminatedOptions(currentQuestionIndex);
+      if (answerHasBeenSelected) {
+        console.log("SELECTED")
+        userAnswerSelections[currentQuestionIndex] = document.querySelector(".selected_answer").id
+        saveAnswer(currentQuestionIndex);
+      }
+      nextQuestionIndex = currentQuestionIndex + 1
+      if (nextQuestionIndex == numQuestions) {
+        nextQuestionIndex = 0;
+      }
+      console.log("nextQuestionIndex: ", nextQuestionIndex)
+      getNextQuestion(nextQuestionIndex)
+      reset();
+    })
+  
+    backBtn.addEventListener("click", function() {
+      console.log("currentQuestionindex: ", currentQuestionIndex)
+      checkForNewAnswerSelection(currentQuestionIndex)
+      saveEliminatedOptions(currentQuestionIndex);
+      if (answerHasBeenSelected) {
+        saveAnswer(Number(currentQuestionNum) - 1);
+      }
+      nextQuestionIndex = currentQuestionIndex - 1
+      console.log("nextQuestionIndex: ", nextQuestionIndex)
+      if (nextQuestionIndex == -1) {
+        console.log("numQuestions: ", numQuestions)
+        nextQuestionIndex = numQuestions - 1;
+      }
+      console.log("nextQuestionIndex: ", nextQuestionIndex)
+      getNextQuestion(nextQuestionIndex)
+      reset();
+    })
+  // }
 
-  backBtn.addEventListener("click", function() {
-    checkForNewAnswerSelection(currentQuestionIndex)
-    if (answerHasBeenSelected) {
-      saveAnswer(Number(currentQuestionNum) - 1);
-    }
-    nextQuestionIndex = currentQuestionIndex - 1
-    if (nextQuestionIndex == -1) {
-      nextQuestionIndex = numQuestions - 1;
-    }
-    console.log("nextQuestionIndex: ", nextQuestionIndex)
-    getNextQuestion(nextQuestionIndex)
-    reset();
-  })
+  function saveEliminatedOptions(currentQuestionIndex) {
+    var answers_divs = Array.from(document.querySelectorAll(".answer_choice"))
+    answers_divs.forEach(function(el, index) {
+      if (el.classList.contains("eliminated")) {
+        console.log("eliminatedAnswerOptionsList[currentQuestionIndex]: ", eliminatedAnswerOptionsList[currentQuestionIndex])
+        console.log("eliminatedAnswerOptionsList[currentQuestionIndex][index]: ", eliminatedAnswerOptionsList[currentQuestionIndex][index])
+        console.log("eliminatedAnswerOptionsList1: ", eliminatedAnswerOptionsList)
+        eliminatedAnswerOptionsList[currentQuestionIndex][index] = true
+        console.log("eliminatedAnswerOptionsList[currentQuestionIndex]: ", eliminatedAnswerOptionsList[currentQuestionIndex])
+        console.log("eliminatedAnswerOptionsList[currentQuestionIndex][index]: ", eliminatedAnswerOptionsList[currentQuestionIndex][index])
+        console.log("eliminatedAnswerOptionsList2: ", eliminatedAnswerOptionsList)
+      } else {
+        eliminatedAnswerOptionsList[currentQuestionIndex][index] = false
+      }
+    })
+  }
 
   function saveAnswer(index) {
     var xhr = new XMLHttpRequest();
@@ -692,8 +776,4 @@
 //   //
 //   // });
 //
-  function reset() {
-    MathJax.texReset();
-    MathJax.typesetClear();
-    MathJax.typeset();
-  }
+  

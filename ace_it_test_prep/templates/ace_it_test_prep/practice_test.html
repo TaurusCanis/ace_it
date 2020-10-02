@@ -46,7 +46,6 @@
       
   		<!-- <div class="questions"> -->
 
-
       <!-- <div>Average Time Remaining Per Question: <span>24</span> seconds per question</div> -->
       {% if section.name == "reading" %}
       <div class="row">
@@ -57,7 +56,7 @@
             </h3>
           </div>
           <div class="row">
-            <div class="border rounded p-3" id="passage"></div>
+            <div class="border rounded p-3" id="passage">{{ passages.0 }}</div>
           </div>
         </div>
       </div>
