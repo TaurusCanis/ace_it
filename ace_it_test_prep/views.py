@@ -50,12 +50,6 @@ def signup(request):
     prep_for_test_type = request.POST.get("test_selection")
     user_type = request.POST.get("user_type")
 
-    print("username: ", username)
-    print("password: ", password)
-    print("test_selection: ", test_selection)
-    print("user_type: ", user_type)
-    print("prep_for_test_type: ", prep_for_test_type)
-
     user = User.objects.create_user(username, username, password, first_name=first_name, last_name=last_name)
     user_profile = UserProfile.objects.create(user=user, user_type=user_type)
 
@@ -893,6 +887,10 @@ def score_test(test_session_id):
             print("incorrect!")
             user_answer.correct = False
             user_answer.answered = True
+        else:
+            print("omitted!")
+            user_answer.correct = False
+            user_answer.answered = False
         user_answer.save()
     return
 
@@ -917,10 +915,11 @@ def submit_section(request):
         test_session.completed =  True
         test_session.save()
         assignmentsession = test_session.assignmentsession_set.first()
-        print("assignmentsession: ", assignmentsession.assignment)
-        assignment = assignmentsession.assignment
-        assignment.completed = True
-        assignment.save()
+        if assignmentsession:
+            print("assignmentsession: ", assignmentsession.assignment)
+            assignment = assignmentsession.assignment
+            assignment.completed = True
+            assignment.save()
 
     print("test_session_section: ", test_session_section.completed)
 
@@ -1001,7 +1000,7 @@ def practice_test_results(request, test_session_id, section=None):
     # }
 
     num_correct = user_answers.filter(correct = True).count()
-    num_incorrect = user_answers.filter(correct = False).count()
+    num_incorrect = user_answers.filter(answered = True, correct = False).count()
     num_omitted = user_answers.filter(answered = False).count()
 
     user_profile = UserProfile.objects.get(user=request.user)

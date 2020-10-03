@@ -3,6 +3,7 @@ var eliminatedAnswerOptionsList;
 var currentQuestionIndex;
 var answerHasBeenSelected;
 var numQuestions;
+var test_session_id;
 
  function getCookie(cname) {
       var name = cname + "=";
@@ -46,7 +47,7 @@ var numQuestions;
     var testId = document.getElementById("test_id");
     var test_section = document.getElementById("section");
     // var sessionId = document.querySelector("#session_id");
-    var test_session_id = document.querySelector("#test_session_id").value
+    test_session_id = document.querySelector("#test_session_id").value
 
     // question metadata
     // var questionNums = document.getElementById("question-nums");
@@ -102,7 +103,7 @@ var numQuestions;
     console.log("userAnswerSelections5: ", userAnswerSelections)
     setQuestionNumBtns()
     // activateAnswerBtns(answers_divs)
-    activateAnswerBtns(answerHasBeenSelected, userAnswerSelections)
+    activateAnswerBtns()
     // activateDirectionalBtns(currentQuestionIndex, answerHasBeenSelected, numQuestions, userAnswerSelections)
     reset()
 
@@ -113,7 +114,6 @@ var numQuestions;
     // var userAnswerSelections;
     
     var answerSelectionIsNew = false;
-    var test_session_id;
     var testHasBeenLoaded = false;
     var question_data;
     var passages;
@@ -308,7 +308,7 @@ var numQuestions;
   
 
   // function activateAnswerBtns(answerOptions) {
-  function activateAnswerBtns(answerHasBeenSelected, userAnswerSelections) {
+  function activateAnswerBtns() {
     answerOptions = document.querySelectorAll(".answer_choice")
     answerOptions.forEach(function(answerOption) {
       answerOption.addEventListener("click", function(e) {
@@ -324,9 +324,10 @@ var numQuestions;
           // currentAnswerSelection = getCurrentAnswerSelection(questionNumber);
           answerOption.classList.add("selected_answer")
           answerHasBeenSelected = true;
-          console.log("answerHasBeenSelected: ", answerHasBeenSelected)
+          
           userAnswerSelections[currentQuestionIndex] = answerOption.id
         }
+        console.log("answerHasBeenSelected: ", answerHasBeenSelected)
       })
       // console.log("userAnswerSelections!!!!: ", userAnswerSelections)
       // console.log("questionNumber - 1!!!!: ", questionNumber - 1)
@@ -352,7 +353,7 @@ var numQuestions;
     backBtn = document.getElementById("back-btn");
     nextBtn.addEventListener("click", function() {
       checkForNewAnswerSelection(currentQuestionIndex)
-      console.log("answerHasBeenSelected: ", answerHasBeenSelected)
+      console.log("answerHasBeenSelected@@@@@@@: ", answerHasBeenSelected)
       saveEliminatedOptions(currentQuestionIndex);
       if (answerHasBeenSelected) {
         console.log("SELECTED")
@@ -409,26 +410,28 @@ var numQuestions;
     var csrftoken = getCookie('csrftoken');
     var method = "POST";
     var url = "save_test_response"
+    question_id = data[index]['question']['id']
+    console.log("question_id: ", question_id)
     console.log("SAVEuserAnswerSelections[index]: ", userAnswerSelections[index])
     console.log("SAVEuserAnswerSelections: ", userAnswerSelections)
     console.log("test_session_id: ", test_session_id)
     console.log("URL: ", url)
     // debugger;
-    var data = JSON.stringify({
+    var request_data = JSON.stringify({
       "index" : index,
       "response": userAnswerSelections[index],
       "session_id": test_session_id,
       "question_id": question_id
      });
 
-     console.log("data: ", data)
+     console.log("request_data: ", request_data)
 
     xhr.open(method, url);
 
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
 
-    xhr.send(data);
+    xhr.send(request_data);
 
     xhr.onload = function() {
 

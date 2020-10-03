@@ -82,7 +82,7 @@
 
           <div class="answer_choices" style="margin: 1em;"> 
             {% for answer_choice in data.0.answers %}
-              <div><span id="eliminate_option_btn_{{forloop.counter0}}" class="eliminate_option_btn"><i class="fas fa-times pr-2"></i></span><span id="{{ answer_choice.value }}" class="answer_choice">{{ forloop.counter|to_char }}. {{ answer_choice.option }}</span></div>
+              <div><span id="eliminate_option_btn_{{forloop.counter0}}" class="eliminate_option_btn"><i class="fas fa-times pr-2"></i></span><span id="{{ answer_choice.value }}" class="answer_choice">{{ forloop.counter|to_char }}. {{ answer_choice.option|safe }}</span></div>
             {% endfor %}
 
 

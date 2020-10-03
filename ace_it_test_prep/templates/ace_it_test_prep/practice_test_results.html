@@ -24,15 +24,15 @@
   </div>
   <div class="row">
     <div class="container border rounded mt-2">
-      <div class="row">
+      <h3 class="row">
         Correctly Answered: {{ num_correct }}
-      </div>
-      <div class="row">
+      </h3>
+      <h3 class="row">
         Inorrectly Answered: {{ num_incorrect }}
-      </div>
-      <div class="row">
-        Omitted: {{ omitted }}
-      </div>
+      </h3>
+      <h3 class="row">
+        Omitted: {{ num_omitted }}
+      </h3>
     </div>
   </div>
   <div class="row">
@@ -50,7 +50,7 @@
         </div>
       {% for test_response, question in zipped_data %}
       <div class="row">
-        <tr {% if test_response.correct is False %}class="table-danger"{% elif test_response.correct is True %}class="table-success"{%elif test_response.answered is False%}class="table-warning"{% endif %}>
+        <tr {% if test_response.correct is False and test_response.answered is True %}class="table-danger"{% elif test_response.correct is True %}class="table-success"{%elif test_response.correct is False and test_response.answered is False %}class="table-warning"{% endif %}>
           <td>{{ question.number }}</td>
           <td>{{ question.question }}</td>
           <td>
@@ -62,7 +62,7 @@
               C. {{ question.option_c }}
             {% elif test_response.response == 3 %}
               D. {{ question.option_d }}
-            {% elif question.correct_answer == '4' %}
+            {% elif question.response == '4' %}
               E. {{ question.option_d }}
             {% else %}
               Not Answered
