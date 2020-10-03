@@ -38,6 +38,7 @@ def upload_TI_Quizlet_Terms(request):
     return JsonResponse({"data": content})
 
 def index(request):
+    print("INDEX PAGE")
     return render(request, "ace_it_test_prep/index.html")
 
 def signup(request):
