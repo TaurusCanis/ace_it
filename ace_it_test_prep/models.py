@@ -34,17 +34,71 @@ class Instructor(models.Model):
 class Parent(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
 
+class PracticeExercise(models.Model):
+    exercise_type = models.CharField(choices={'practice_test', 'practice_exercise'}) 
+    name = models.CharField(max_length=200)
+
 class Test(models.Model):
     test_type = models.CharField(choices=TEST_TYPES, max_length=4, blank=True, null=True)
     name = models.CharField(max_length=200)
 
+class Question(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, blank=True, null=True)
+    practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE, blank=True, null=True)
+    section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
+    question_text = models.CharField(max_length=1000)
+    correct_answer = models.CharField(max_length=10)
+    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE, blank=True, null=True)
+    question_type = models.CharField(max_length=100, blank=True, null=True)
+    difficulty = models.CharField(max_length=100, blank=True, null=True)
+    primary_topic = models.CharField(max_length=100, blank=True, null=True)
+    secondary_topic = models.CharField(max_length=100, blank=True, null=True)
+    number = models.IntegerField()
+    diagram_src = models.CharField(max_length=2000, blank=True, null=True)
+    # option_a = models.CharField(max_length=100, default="A")
+    # option_b = models.CharField(max_length=100, default="B")
+    # option_c = models.CharField(max_length=100, default="C")
+    # option_d = models.CharField(max_length=100, default="D")
+    # option_e = models.CharField(max_length=100, default="E", null=True, blank=True)
+
+class Answer(models.Model):
+	question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
+	# LABEL = [('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E')]
+	# label = models.CharField(choices=LABEL, max_length=200, default='A')
+	value = models.IntegerField()
+	option = models.CharField(max_length = 500)
+	explanation = models.CharField(max_length=2000, default='n', blank=True, null=True)
+	num_students_choice = models.IntegerField(blank=True, null=True)
+
 class TestSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    started = models.BooleanField(default=False)
-    completed = models.BooleanField(default=False)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
+    time_started = models.DateTimeField()
+    time_finished = models.DateTimeField()
+    math_1_start_time = models.DateTimeField()
+    math_1_finished_time =  models.DateTimeField()
+    reading_start_time = models.DateTimeField()
+    reading_finished_time =  models.DateTimeField()
+    verbal_start_time = models.DateTimeField()
+    verbal_finished_time =  models.DateTimeField()
+    math_2_start_time = models.DateTimeField()
+    math_2_finished_time =  models.DateTimeField()
+    score = models.ForeignKey("Score")
+
+class PracticeSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
+    time_started = models.DateTimeField()
+    time_finished = models.DateTimeField() 
+    score = models.ForeignKey("Score")
+
+# class TestSession(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     test = models.ForeignKey(Test, on_delete=models.CASCADE)
+#     start_date = models.DateTimeField(null=True, blank=True)
+#     end_date = models.DateTimeField(null=True, blank=True)
+#     started = models.BooleanField(default=False)
+#     completed = models.BooleanField(default=False)
 
     # def __str__(self):
         # return test.name
@@ -52,17 +106,20 @@ class TestSession(models.Model):
 class Assignment(models.Model):
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, null=True, blank=True)
+    practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE, null=True, blank=True)
     date_assigned = models.DateTimeField(auto_now_add=True)
     ##This should probably be changed to allow for future assignments ##
     due_date = models.DateTimeField(null=True, blank=True)
     started = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
 
+# Is this necessary?
 class AssignmentSession(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
 
+# Is this necessary?
 class Section(models.Model):
     name = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
     num_questions = models.IntegerField()
@@ -73,6 +130,7 @@ class Section(models.Model):
     def __str__(self):
         return self.name
 
+# Is this necessary?
 class TestSessionSection(models.Model):
     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
@@ -103,76 +161,57 @@ class TestSessionSection(models.Model):
 #     question_type = models.CharField()
 #     difficulty = models.CharField()
 
-class SSAT(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    math_1_start_time = models.DateTimeField()
-    math_1_end_time = models.DateTimeField()
-    math_2_start_time = models.DateTimeField()
-    math_2_end_time = models.DateTimeField()
-    reading_start_time = models.DateTimeField()
-    reading_end_time = models.DateTimeField()
-    verbal_start_time = models.DateTimeField()
-    verbal_end_time = models.DateTimeField()
+# class SSAT(models.Model):
+#     test = models.ForeignKey(Test, on_delete=models.CASCADE)
+#     math_1_start_time = models.DateTimeField()
+#     math_1_end_time = models.DateTimeField()
+#     math_2_start_time = models.DateTimeField()
+#     math_2_end_time = models.DateTimeField()
+#     reading_start_time = models.DateTimeField()
+#     reading_end_time = models.DateTimeField()
+#     verbal_start_time = models.DateTimeField()
+#     verbal_end_time = models.DateTimeField()
 
-class SSATReadingQuestion(models.Model):
-    test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
-    question = models.CharField(max_length=10000)
-    passage = models.ForeignKey("ReadingPassage", on_delete=models.CASCADE)
-    question_type = models.CharField(max_length=1000)
-    difficulty = models.CharField(max_length=100)
+# class SSATReadingQuestion(models.Model):
+#     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
+#     question = models.CharField(max_length=10000)
+#     passage = models.ForeignKey("ReadingPassage", on_delete=models.CASCADE)
+#     question_type = models.CharField(max_length=1000)
+#     difficulty = models.CharField(max_length=100)
 
-class ReadingPassage(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    text = models.CharField(max_length=10000)
-    passage_index = models.IntegerField()
+# class ReadingPassage(models.Model):
+#     test = models.ForeignKey(Test, on_delete=models.CASCADE)
+#     text = models.CharField(max_length=10000)
+#     passage_index = models.IntegerField()
 
-class SSATVerbalQuestion(models.Model):
-    test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
-    question = models.CharField(max_length=1000)
-    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE)
-    concept = models.CharField(max_length=100)
-    difficulty = models.CharField(max_length=10)
+# class SSATVerbalQuestion(models.Model):
+#     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
+#     question = models.CharField(max_length=1000)
+#     passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE)
+#     concept = models.CharField(max_length=100)
+#     difficulty = models.CharField(max_length=10)
 
-class SSATMathQuestion(models.Model):
-    test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
-    question = models.CharField(max_length=1000)
-    diagram = models.ImageField(blank=True, null=True)
-    concept = models.CharField(max_length=100)
-    difficulty = models.CharField(max_length=10)
+# class SSATMathQuestion(models.Model):
+#     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
+#     question = models.CharField(max_length=1000)
+#     diagram = models.ImageField(blank=True, null=True)
+#     concept = models.CharField(max_length=100)
+#     difficulty = models.CharField(max_length=10)
 
-class QCMathQuestion(models.Model):
-    test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
-    question = models.CharField(max_length=1000)
-    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE)
-    question_type = models.CharField(max_length=100)
-    difficulty = models.CharField(max_length=10)
+# class QCMathQuestion(models.Model):
+#     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)
+#     question = models.CharField(max_length=1000)
+#     passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE)
+#     question_type = models.CharField(max_length=100)
+#     difficulty = models.CharField(max_length=10)
 
-class Question(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
-    question_text = models.CharField(max_length=1000)
-    correct_answer = models.CharField(max_length=10)
-    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE, blank=True, null=True)
-    question_type = models.CharField(max_length=100, blank=True, null=True)
-    difficulty = models.CharField(max_length=100, blank=True, null=True)
-    primary_topic = models.CharField(max_length=100, blank=True, null=True)
-    secondary_topic = models.CharField(max_length=100, blank=True, null=True)
-    number = models.IntegerField()
-    diagram_src = models.CharField(max_length=2000, blank=True, null=True)
-    # option_a = models.CharField(max_length=100, default="A")
-    # option_b = models.CharField(max_length=100, default="B")
-    # option_c = models.CharField(max_length=100, default="C")
-    # option_d = models.CharField(max_length=100, default="D")
-    # option_e = models.CharField(max_length=100, default="E", null=True, blank=True)
 
-class Answer(models.Model):
-	question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
-	# LABEL = [('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'), ('E', 'E')]
-	# label = models.CharField(choices=LABEL, max_length=200, default='A')
-	value = models.IntegerField()
-	option = models.CharField(max_length = 500)
-	explanation = models.CharField(max_length=2000, default='n', blank=True, null=True)
-	num_students_choice = models.IntegerField(blank=True, null=True)
+class PracticeExerciseResponse(models.Model):
+    session = models.ForeignKey(PracticeSession, on_delete=models.CASCADE, blank=False)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
+    response = models.IntegerField(default=-1)  
+    answered = models.BooleanField(default=False)
+	correct = models.BooleanField(default=False)
 
 class TestResponse(models.Model):
 	session = models.ForeignKey(TestSession, on_delete=models.CASCADE, blank=False)
@@ -183,7 +222,7 @@ class TestResponse(models.Model):
 #	number = models.CharField(max_length=200)
 #	question = models.CharField(max_length=200)
 	response = models.IntegerField(default=-1)
-	answered = models.BooleanField(default=False)
+    answered = models.BooleanField(default=False)
 	correct = models.BooleanField(default=False)
 
 class VocabularyTerm(models.Model):
