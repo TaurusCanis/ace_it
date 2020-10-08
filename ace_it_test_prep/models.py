@@ -209,7 +209,7 @@ class TestSessionSection(models.Model):
 class PracticeExerciseResponse(models.Model):
     session = models.ForeignKey(PracticeSession, on_delete=models.CASCADE, blank=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
-    response = models.IntegerField(default=-1)  
+    response = models.IntegerField(default=-1)
     answered = models.BooleanField(default=False)
     correct = models.BooleanField(default=False)
 
