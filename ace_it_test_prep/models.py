@@ -214,14 +214,14 @@ class PracticeExerciseResponse(models.Model):
     correct = models.BooleanField(default=False)
 
 class TestResponse(models.Model):
-	session = models.ForeignKey(TestSession, on_delete=models.CASCADE, blank=False)
-	question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
-	# test_id = models.ForeignKey(Test, on_delete=models.CASCADE, default='1')
-	# SECTION = [('math_1', 'MATH_1'), ('reading', 'READING'), ('verbal', 'VERBAL'), ('math_2', 'MATH_2')]
-	# section = models.CharField(choices=SECTION, max_length=200)
-#	number = models.CharField(max_length=200)
-#	question = models.CharField(max_length=200)
-	response = models.IntegerField(default=-1)
+    session = models.ForeignKey(TestSession, on_delete=models.CASCADE, blank=False)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
+    # test_id = models.ForeignKey(Test, on_delete=models.CASCADE, default='1')
+    # SECTION = [('math_1', 'MATH_1'), ('reading', 'READING'), ('verbal', 'VERBAL'), ('math_2', 'MATH_2')]
+    # section = models.CharField(choices=SECTION, max_length=200)
+    #	number = models.CharField(max_length=200)
+    #	question = models.CharField(max_length=200)
+    response = models.IntegerField(default=-1)
     answered = models.BooleanField(default=False)
     correct = models.BooleanField(default=False)
 
