@@ -211,7 +211,7 @@ class PracticeExerciseResponse(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
     response = models.IntegerField(default=-1)  
     answered = models.BooleanField(default=False)
-	correct = models.BooleanField(default=False)
+    correct = models.BooleanField(default=False)
 
 class TestResponse(models.Model):
 	session = models.ForeignKey(TestSession, on_delete=models.CASCADE, blank=False)
@@ -223,7 +223,7 @@ class TestResponse(models.Model):
 #	question = models.CharField(max_length=200)
 	response = models.IntegerField(default=-1)
     answered = models.BooleanField(default=False)
-	correct = models.BooleanField(default=False)
+    correct = models.BooleanField(default=False)
 
 class VocabularyTerm(models.Model):
     term = models.CharField(max_length=100)
