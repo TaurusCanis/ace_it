@@ -83,14 +83,14 @@ class TestSession(models.Model):
     verbal_finished_time =  models.DateTimeField()
     math_2_start_time = models.DateTimeField()
     math_2_finished_time =  models.DateTimeField()
-    score = models.ForeignKey("Score")
+    score = models.ForeignKey("Score", on_delete=models.CASCADE)
 
 class PracticeSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
     time_started = models.DateTimeField()
     time_finished = models.DateTimeField() 
-    score = models.ForeignKey("Score")
+    score = models.ForeignKey("Score", on_delete=models.CASCADE)
 
 # class TestSession(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)
