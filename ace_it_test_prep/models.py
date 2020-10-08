@@ -48,7 +48,7 @@ class Question(models.Model):
     section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
     question_text = models.CharField(max_length=1000)
     correct_answer = models.CharField(max_length=10)
-    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE, blank=True, null=True)
+    passage = models.ForeignKey("ReadingPassage", on_delete=models.CASCADE, blank=True, null=True)
     question_type = models.CharField(max_length=100, blank=True, null=True)
     difficulty = models.CharField(max_length=100, blank=True, null=True)
     primary_topic = models.CharField(max_length=100, blank=True, null=True)
