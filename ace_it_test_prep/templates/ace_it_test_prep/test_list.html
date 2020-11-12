@@ -1,0 +1,7 @@
+{% extends 'ace_it_test_prep/base.html' %}
+{% block content %}
+<h1>Practice Tests</h1>
+{% for test in object_list %}
+<a href="{% url 'ace_it_test_prep:practice_test_detail_view' pk=test.id %}">{{ test }}</a>
+{% endfor %}
+{% endblock %}

@@ -54,3 +54,7 @@ h1, h2 {
 #pracrice_test_link {
   color: black;
 }
+
+.alert {
+  display: block;
+}

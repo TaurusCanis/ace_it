@@ -47,7 +47,7 @@
   		<!-- <div class="questions"> -->
 
       <!-- <div>Average Time Remaining Per Question: <span>24</span> seconds per question</div> -->
-      {% if section.name == "reading" %}
+      {% if section == "Reading" %}
       <div class="row">
         <div class="question_container container">
           <div class="row pb-2">
@@ -56,7 +56,8 @@
             </h3>
           </div>
           <div class="row">
-            <div class="border rounded p-3" id="passage">{{ passages.0 }}</div>
+            <!-- <div class="border rounded p-3" id="passage">{{ passages.0.text|safe }}</div> -->
+            <div class="border rounded p-3" id="passage">{{ passages|get_passage:passage_index|safe }}</div>
           </div>
         </div>
       </div>
@@ -64,13 +65,13 @@
       <div class="row">
         <div class="question-detail-container container">
           <h6>
-            <span id="num">{{ data.0.question.number }}. </span>
-            <span id="question">{{ data.0.question.question_text|safe }}</span>
+            <span id="num">{{ q_and_a.0.question.number }}. </span>
+            <span id="question">{{ q_and_a.0.question.question_text|safe }}</span>
           </h6>
           <input id="question_id" type="hidden" value="{{data.0.question.id}}">
           <div>{{ context.0.question.question_detail_text|safe }}</div>
           <div>
-            {% if data.0.question.diagram_src != "None" %}
+            {% if q_and_a.0.question.diagram_src != "None" %}
             <img id="diagram" src="{{ data.0.question.diagram_src }}">
             {% endif %}
 
@@ -81,7 +82,7 @@
         <div class="answer_choices_container container">
 
           <div class="answer_choices" style="margin: 1em;"> 
-            {% for answer_choice in data.0.answers %}
+            {% for answer_choice in q_and_a.0.answers %}
               <div><span id="eliminate_option_btn_{{forloop.counter0}}" class="eliminate_option_btn"><i class="fas fa-times pr-2"></i></span><span id="{{ answer_choice.value }}" class="answer_choice">{{ forloop.counter|to_char }}. {{ answer_choice.option|safe }}</span></div>
             {% endfor %}
 
@@ -120,7 +121,7 @@
             </div>
           </div> -->
           <div class="test_section">
-            <form class="text-center pb-4" action="{% url 'ace_it_test_prep:submit_section' %}" method="POST">
+            <form class="text-center pb-4" action="{% url 'ace_it_test_prep:submit_section' %}" method="post">
               {% csrf_token %}
               <input type="hidden" id="test_session_id" name="test_session_id" value="{{ test_session_id }}">
               <input type="hidden" id="question_nums" name="question_nums" value="{{ question_nums }}">
@@ -152,21 +153,30 @@
   		</script> -->
 
       <script>
-        if ("{{ section }}" == 'reading') {
+        if ("{{ section }}" == 'Reading') {
           var current_section = "reading"
-          passages = JSON.parse({{ passages|safe }})
+          passages = {{ passages|safe }}
+          // passages = JSON.parse("{{ passages|escapejs|safe }}")
+          console.log("passagesA: ", passages[1])
           console.log("passagesA: ", passages)
         }
+        var passage_index = "{{ passage_index }}"
+        console.log("passage_index: ", passage_index)
         var None = null
         testing = "{{ testing }}"
         console.log("testing: ", testing)
-        data = {{ data|safe }}
-        console.log("data: ", data)
+        // data = {{ data|safe }}
+        // data = {{ q_and_a|safe }}
+        // console.log("data: ", data)
+        q_and_a = {{ q_and_a|safe }}
+        console.log("q_and_a: ", q_and_a)
+        
         
       </script>
 
+      <script src="{% static 'scripts/timer.js' %}"></script>
       <script src="{% static 'scripts/practice_test.js' %}"></script>
-  		<script src="{% static 'scripts/timer.js' %}"></script>
+  		
 
 
       {% endblock %}

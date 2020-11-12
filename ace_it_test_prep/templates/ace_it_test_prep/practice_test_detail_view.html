@@ -1,0 +1,15 @@
+{% extends 'ace_it_test_prep/base.html' %}
+{% block content %}
+<h1>Practice Test Details</h1>
+{{ context }}
+{{ object }}
+{% for section, status in section_statuses.items %}
+<div>
+{% if status == "N" %}
+<a href="{% url 'ace_it_test_prep:practice_test_start_page' test_id=object.id section=section %}">{{ section }} - Begin</a>
+{% elif status == "C" %}
+<a href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session.id section=section %}">{{ section }} - View Results</a>
+{% endif %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -20,4 +20,7 @@ def verbal_uppercase(value):
         term_list[3] = term_list[3].upper()
         return " ".join(term_list)
         
-
+@register.filter
+def get_passage(dict, key):
+    return dict[key]['text']
+    # return key['text']

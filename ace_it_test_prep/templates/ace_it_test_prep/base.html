@@ -22,6 +22,13 @@
   <body>
 		<header>
 			{% include 'ace_it_test_prep/navbar.html' %}
+			{% if messages %}
+			<div class="messages">
+				{% for message in messages %}
+				<div{% if message.tags %} class="{{ message.tags }} alert alert-danger list-unstyled pl-2" role="alert"{% endif %}>{{ message }}</div>
+				{% endfor %}
+			</div>
+			{% endif %}
 			{% block header %}
 
 

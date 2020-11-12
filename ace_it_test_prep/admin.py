@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import TextInput, Textarea
-from .models import Test, TestSession, SSAT, Question, SSATMathQuestion, TestResponse, Answer, Section, TestSessionSection, Student, Instructor, Assignment, VocabularyRoot, VocabularyTerm, VocabularyTermSynonym, PracticeSetQuestion, PracticeSet, VocabularyCentralIdea, ReadingPassage
+from .models import (
+    Test, TestSession, Question, TestResponse, Answer, 
+    Student, Instructor, Assignment, VocabularyRoot, VocabularyTerm, 
+    VocabularyTermSynonym, PracticeSetQuestion, PracticeSet, 
+    VocabularyCentralIdea, ReadingPassage, PracticeExercise
+)
 # Register your models here.
 
 class ReadingPassageAdmin(admin.ModelAdmin):
@@ -19,15 +24,15 @@ class ReadingPassageAdmin(admin.ModelAdmin):
 
 admin.site.register(Test)
 admin.site.register(TestSession)
-admin.site.register(SSAT)
+# admin.site.register(SSAT)
 admin.site.register(Question)
-admin.site.register(SSATMathQuestion)
+# admin.site.register(SSATMathQuestion)
 admin.site.register(TestResponse)
 admin.site.register(Answer)
-admin.site.register(Section)
+# admin.site.register(Section)
 admin.site.register(Student)
 admin.site.register(Instructor)
-admin.site.register(TestSessionSection)
+# admin.site.register(TestSessionSection)
 admin.site.register(Assignment)
 admin.site.register(VocabularyRoot)
 admin.site.register(VocabularyTerm)
@@ -36,4 +41,5 @@ admin.site.register(PracticeSetQuestion)
 admin.site.register(PracticeSet)
 admin.site.register(VocabularyCentralIdea)
 admin.site.register(ReadingPassage, ReadingPassageAdmin)
+admin.site.register(PracticeExercise)
 

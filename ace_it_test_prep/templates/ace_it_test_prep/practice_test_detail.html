@@ -15,6 +15,7 @@
     {{ user.first_name }} {{ user.last_name }}
   </div>
   <div class="row">
+    {{ practice_test_section_statuses }}
     <div class="container border rounded my-3">
       {% for section_data in sections_data %}
       <div class="test_section row py-1 px-2">

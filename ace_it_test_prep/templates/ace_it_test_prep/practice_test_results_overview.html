@@ -10,10 +10,9 @@
   <h1>Practice Test 1</h1>
   <h2>Student: {{ user.first_name }} {{ user.last_name }}</h2>
   <div class="container">
-    {% for section_data in sections_data %}
+    {% for section, status in section_data.items %}
     <div class="test_section">
-        View Results
-        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=section_data.section %}">{{section_data.section}}</a>
+        <a id="practice_test_link" href="{% url 'ace_it_test_prep:practice_test_results' test_session_id=test_session_id section=section %}">View Results - {{section}}</a>
     </div>
     {% endfor %}
   </div>

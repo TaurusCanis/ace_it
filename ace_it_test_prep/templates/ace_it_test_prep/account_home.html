@@ -21,6 +21,9 @@
     </div>
     <div class="row">
       <div class="container">
+        <div class="row">
+          <a href="">View Assignments</a>
+        </div>
           {% for assignment in incomplete_assignments %}
           <div class="row">
             {{ assignment.test.name }}
@@ -51,10 +54,31 @@
           <div class="card">
             <div class="card-body">
               <div class="card-title">
-                <h5>Pratice Tests</h5>
+                <h5>Next Recommended Practice Exercise</h5>
               </div>
               <div class="card-text">
                 <div class="container">
+                  <a href="">{{ recommended_next_exercise }}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row my-5">
+      <div class="col">
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <div class="card-title">
+                <h5>Practice Tests</h5>
+              </div>
+              <div class="card-text">
+                <div class="container">
+                  <div class="row">
+                    <a href="{% url 'ace_it_test_prep:practice_test_list_view' %}">Practice Tests</a>
+                  </div>
                   {% for ssat_practice_test in ssat_practice_test_list %}
                   <div class="row">
                     {% if ssat_practice_test.test_status == "completed" %}

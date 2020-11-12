@@ -84,12 +84,14 @@
             {% endif %}
           </td>
           <td>
-            <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' %}">
+            {{ test_response }}
+            <a href="{% url 'ace_it_test_prep:practice_test_results_detail_view' test_response_id=test_response.id %}">View Question</a>
+            <!-- <form method="post" action="{% url 'ace_it_test_prep:practice_test_results_detail_view' test_response_id=test_response.id %}">
               {% csrf_token %}
               <input type="hidden" value="{{ test_response.id }}" name="test_response_id">
               <input type="hidden" value="{{ question.id }}" name="question_id">
               <button class="btn btn-info" type="submit">View Question</button>
-            </form>
+            </form> -->
           </td>
         </tr>
       </div>

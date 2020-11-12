@@ -11,7 +11,7 @@ class Command( BaseCommand):
     def handle( self, *args, **options ):
         # use commented line below if taking in absolute path
         # with open(options['json_file'], 'r') as json_file:
-        with open('ace_it_test_prep/management/commands/SSAT_Practice_Test_4_Official.json', 'r') as json_file:
+        with open('ace_it_test_prep/management/commands/SSAT_Practice_Test_1_Official.json', 'r') as json_file:
         	json_data = json_file.read()
 
         json_data_dict = json.loads(json_data)

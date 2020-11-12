@@ -1,11 +1,17 @@
+// import { clock_minutes } from "./timer.js"
+// import { clock_seconds } from "./timer.js"
 var userAnswerSelections;
 var eliminatedAnswerOptionsList;
 var currentQuestionIndex;
 var answerHasBeenSelected;
 var numQuestions;
 var test_session_id;
+var isInitialSetup;
+var passageDiv;
+var timeSpentOnQuestions = {};
 
  function getCookie(cname) {
+   console.log("GET COOKIE")
       var name = cname + "=";
       var decodedCookie = decodeURIComponent(document.cookie);
       var ca = decodedCookie.split(';');
@@ -38,8 +44,11 @@ var test_session_id;
   })();
 
   function setupPage() {
+    console.log("SETUP")
 
     // ----------- VARIABLE ASSIGNMENT -----------------
+
+    isInitialSetup = true;
 
     // var pauseSession = document.querySelector("#pause-session");
 
@@ -78,13 +87,22 @@ var test_session_id;
     eliminatedListInitialSingle = [false, false, false, false, false]
     eliminatedAnswerOptionsList = []
 
+    console.log("NUM QUESTIONS: ", numQuestions)
+
     for (i = 0; i < numQuestions; i++) {
+      timeSpentOnQuestions[i + 1] = [{
+        "start_time": null,
+        "end_time": null
+      }]
       console.log("eliminatedListInitialSingle type: ", Array.isArray(eliminatedListInitialSingle))
       eliminatedAnswerOptionsList[i] = new Array(false, false, false, false, false)
       // eliminatedListInitialSingle.forEach(function(el, index) {
       //   eliminatedAnswerOptionsList[i][index] = el
       // })
     }
+    timeSpentOnQuestions[1][0]["start_time"] = "30:00"
+    console.log("eliminatedAnswerOptionsList*******: ", eliminatedAnswerOptionsList)
+    console.log("timeSpentOnQuestionsQQQQQQQQQQQ: ", timeSpentOnQuestions)
 
     // var eliminateOptionBtnGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
     userAnswerSelections = Array.from({length: numQuestions})
@@ -129,7 +147,8 @@ var test_session_id;
     var answerSelectionHasChanged = false;
     var timeExpired = false;
     var paginationBtns;
-  
+    
+    isInitialSetup = false;
   }
 
   // function setEliminatedAnswers(eliminateOptionBtnGroup, answers_divs){
@@ -157,14 +176,19 @@ var test_session_id;
   }
 
 
-  function setReadingPassage(passageDiv, passage_index) {
+  // function setReadingPassage(passageDiv, passage_index) {
+  function setReadingPassage(passageDiv) {
     console.log("passage_id: ", passage_index)
-    console.log("passages: ", passages[0]['fields'])
-    passageDiv.innerHTML = passages[passage_index]['fields']['text']
+    console.log("passages******&&&&&^^^^^^^^: ", passages[0])
+    console.log("passages******&&&&&^^^^^^^^: ", passages[passage_index])
+    passageDiv.innerHTML = passages[passage_index]['text']
   }
 
   function setQuestionNumBtns() {
-    saveAnswer(currentQuestionIndex)
+    if (!isInitialSetup) {
+      console.log("isInitialSetup: ", isInitialSetup)
+      saveAnswer(currentQuestionIndex)
+    }
     questionNumBtns = document.querySelectorAll(".question_num_btn")
     questionNumBtns.forEach((btn, index) => {
       btn.addEventListener("click", function() {
@@ -177,9 +201,10 @@ var test_session_id;
   function getNextQuestion(questionIndex) {
     console.log("eliminatedAnswerOptionsList*******: ", eliminatedAnswerOptionsList[currentQuestionIndex])
     console.log("eliminatedAnswerOptionsList!!!!! ", eliminatedAnswerOptionsList)
-    nextQuestion = data[questionIndex]
+    // nextQuestion = data[questionIndex]
+    nextQuestion = q_and_a[questionIndex]
     currentQuestionIndex = questionIndex
-    setNextQuestion(nextQuestion, currentQuestionIndex)
+    setNextQuestion(nextQuestion, currentQuestionIndex, questionIndex)
     console.log("currentQuestionIndex: ", currentQuestionIndex)
   }
 
@@ -189,7 +214,8 @@ var test_session_id;
     MathJax.typeset();
   }
 
-  function setNextQuestion(nextQuestion, currentQuestionIndex) {
+  function setNextQuestion(nextQuestion, currentQuestionIndex, nextQuestionIndex) {
+    console.log("NEXT Q: ", clock_minutes, ":", clock_seconds)
     answerOptionsGroup = Array.from(document.querySelectorAll(".eliminate_option_btn"))
     answers_divs = document.querySelectorAll(".answer_choice")
     eliminatedAnswerOptions = answerOptionsGroup.map(function(el, index) {
@@ -208,18 +234,28 @@ var test_session_id;
     var answersData = nextQuestion.answers
 
     if (nextQuestion.question.passage) {
+
+      passage_index = nextQuestion.question.passage
+      console.log("PASSAGE_INDEX**********: ", passage_index)
+      console.log("PASSAGE**********: ", passages[passage_index]['text'])
+
+      passageDiv.innerHTML = passages[passage_index]['text']
+
+      // setReadingPassage(passageDiv, passage_index)
       
-      passage_id = nextQuestion.question.passage.id 
-      nextPassage = passages.find(function(p) {
-          return p['pk'] == nextQuestion.question.passage
-      });
+      // passage_id = nextQuestion.question.passage.id 
+      // nextPassage = passages.find(function(p) {
+      //     return p['pk'] == nextQuestion.question.passage
+      // });
       
       // passageDiv.innerHTML = passages[nextQuestion.question.passage - 19]["fields"]["text"]
-      passage_title = document.querySelector("#passage_title")
-      passage_title.innerHTML = "Passage " + Number(nextPassage['fields']['passage_index'] + 1)
-      document.querySelector("#passage").innerHTML = nextPassage["fields"]["text"]
+
+      // passage_title = document.querySelector("#passage_title")
+      // passage_title.innerHTML = "Passage " + Number(nextPassage['fields']['passage_index'] + 1)
+      // document.querySelector("#passage").innerHTML = nextPassage["fields"]["text"]
     }
     setNextAnswers(answersData, currentQuestionIndex);
+    updateTimeSpentOnQuestions(currentQuestionIndex, nextQuestionIndex)
   }
 
   function setNextAnswers(answersData, currentQuestionIndex) {
@@ -253,10 +289,12 @@ var test_session_id;
   window.onload = function () {
     setupPage();
     if (current_section == 'reading') {
+      console.log("PASSAGE_INDEX()()()(()()): ", passage_index)
+      console.log("passages@#@#@#@#@#@#: ", passages[passage_index]['text'])
       this.console.log("reading")
-      var passageDiv = document.querySelector("#passage")
-      console.log(passages[0]['fields']['passage_index'])
-      setReadingPassage(passageDiv, passages[0]['fields']['passage_index'])
+      passageDiv = document.querySelector("#passage")
+      console.log("!@#$%^&*: ", passages[passage_index]['text'])
+      setReadingPassage(passageDiv, passages[passage_index]['text'])
     }
   }
 
@@ -365,6 +403,7 @@ var test_session_id;
         nextQuestionIndex = 0;
       }
       console.log("nextQuestionIndex: ", nextQuestionIndex)
+      updateTimeSpentOnQuestions(currentQuestionIndex, nextQuestionIndex)
       getNextQuestion(nextQuestionIndex)
       reset();
     })
@@ -384,9 +423,24 @@ var test_session_id;
       }
       console.log("nextQuestionIndex: ", nextQuestionIndex)
       getNextQuestion(nextQuestionIndex)
+      updateTimeSpentOnQuestions(currentQuestionIndex, nextQuestionIndex)
       reset();
     })
   // }
+
+  function updateTimeSpentOnQuestions(currentQuestionIndex, nextQuestionIndex) {
+    currentQuestionNumber = currentQuestionIndex + 1
+    nextQuestionNumber = nextQuestionIndex + 1
+    console.log("timeSpentOnQuestions[currentQuestionNumber]: ", timeSpentOnQuestions[currentQuestionNumber])
+    currentQuestionIndexLength = timeSpentOnQuestions[currentQuestionNumber].length
+    nextQuestionIndexLength = timeSpentOnQuestions[nextQuestionNumber].length
+
+    console.log("timeSpentOnQuestions[currentQuestionNumber]: ", timeSpentOnQuestions[currentQuestionNumber])
+    console.log("timeSpentOnQuestions[nextQuestionNumber]: ", timeSpentOnQuestions[nextQuestionNumber])
+    timeSpentOnQuestions[currentQuestionNumber][currentQuestionIndexLength - 1].end_time = clock_minutes + ":" + clock_seconds
+    timeSpentOnQuestions[nextQuestionNumber][nextQuestionIndexLength - 1].start_time = clock_minutes + ":" + clock_seconds
+    console.log("timeSpentOnQuestions: ", timeSpentOnQuestions)
+  }
 
   function saveEliminatedOptions(currentQuestionIndex) {
     var answers_divs = Array.from(document.querySelectorAll(".answer_choice"))
@@ -410,7 +464,7 @@ var test_session_id;
     var csrftoken = getCookie('csrftoken');
     var method = "POST";
     var url = "save_test_response"
-    question_id = data[index]['question']['id']
+    question_id = q_and_a[index]['question']['id']
     console.log("question_id: ", question_id)
     console.log("SAVEuserAnswerSelections[index]: ", userAnswerSelections[index])
     console.log("SAVEuserAnswerSelections: ", userAnswerSelections)

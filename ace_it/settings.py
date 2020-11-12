@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'ace_it_test_prep',
 ]
 
@@ -91,6 +92,8 @@ DATABASES = {
     #     'PORT': '5432',
     # }
 }
+
+print("DATABASES: ", DATABASES)
 
 
 # Password validation

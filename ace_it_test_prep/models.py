@@ -11,6 +11,10 @@ TEST_TYPES = {
     ("ssat", "SSAT"), ("sat", "SAT"), ("act", "ACT")
 }
 
+TEST_STATUSES = {
+    ("N", "Not Started"), ("I", "In Progress"), ("C", "Completed")
+}
+
 SECTION_TYPES = {
     ("math_1", "math_1"), ("math_2", "math_2"), ("reading", "reading"), ("verbal", "verbal")
 }
@@ -35,7 +39,7 @@ class Parent(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
 
 class PracticeExercise(models.Model):
-    exercise_type = models.CharField(choices={'practice_test', 'practice_exercise'}) 
+    exercise_type = models.CharField(max_length=40, choices={('practice_test', 'practice_exercise')}) 
     name = models.CharField(max_length=200)
 
 class Test(models.Model):
@@ -73,35 +77,41 @@ class Answer(models.Model):
 class TestSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     test = models.ForeignKey(Test, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
-    time_started = models.DateTimeField()
-    time_finished = models.DateTimeField()
-    math_1_start_time = models.DateTimeField()
-    math_1_finished_time =  models.DateTimeField()
-    reading_start_time = models.DateTimeField()
-    reading_finished_time =  models.DateTimeField()
-    verbal_start_time = models.DateTimeField()
-    verbal_finished_time =  models.DateTimeField()
-    math_2_start_time = models.DateTimeField()
-    math_2_finished_time =  models.DateTimeField()
-    score = models.ForeignKey("Score", on_delete=models.CASCADE)
+    test_responses_have_been_created = models.BooleanField(default=False)
+    started = models.BooleanField(default=False)
+    finished = models.BooleanField(default=False)
+    section_status_math_1 = models.CharField(choices=TEST_STATUSES, max_length=1, default="N")
+    section_status_reading = models.CharField(choices=TEST_STATUSES, max_length=1, default="N")
+    section_status_verbal = models.CharField(choices=TEST_STATUSES, max_length=1, default="N")
+    section_status_math_2 = models.CharField(choices=TEST_STATUSES, max_length=1, default="N")
+    time_started_math_1 = models.DateTimeField(blank=True, null=True)
+    time_finished_math_1 = models.DateTimeField(blank=True, null=True)
+    time_started_reading = models.DateTimeField(blank=True, null=True)
+    time_finished_reading = models.DateTimeField(blank=True, null=True)
+    time_started_verbal = models.DateTimeField(blank=True, null=True)
+    time_finished_verbal = models.DateTimeField(blank=True, null=True)
+    time_started_math_2 = models.DateTimeField(blank=True, null=True)
+    time_finished_math_2 = models.DateTimeField(blank=True, null=True)
+    score = models.ForeignKey("PracticeTestScore", on_delete=models.CASCADE, blank=True, null=True)
 
 class PracticeSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
-    time_started = models.DateTimeField()
-    time_finished = models.DateTimeField() 
-    score = models.ForeignKey("Score", on_delete=models.CASCADE)
+    time_started = models.DateTimeField(blank=True, null=True)
+    time_finished = models.DateTimeField(blank=True, null=True) 
+    score = models.ForeignKey("PracticeExerciseScore", on_delete=models.CASCADE, blank=True, null=True)
 
-# class TestSession(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     test = models.ForeignKey(Test, on_delete=models.CASCADE)
-#     start_date = models.DateTimeField(null=True, blank=True)
-#     end_date = models.DateTimeField(null=True, blank=True)
-#     started = models.BooleanField(default=False)
-#     completed = models.BooleanField(default=False)
+class PracticeTestScore(models.Model):
+    math_raw = models.IntegerField()
+    reading_raw = models.IntegerField()
+    verbal_raw =  models.IntegerField()
 
-    # def __str__(self):
-        # return test.name
+class PracticeExerciseScore(models.Model):
+    section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
+    raw_score = models.IntegerField()
+
+
+
 
 class Assignment(models.Model):
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
@@ -179,10 +189,10 @@ class TestSessionSection(models.Model):
 #     question_type = models.CharField(max_length=1000)
 #     difficulty = models.CharField(max_length=100)
 
-# class ReadingPassage(models.Model):
-#     test = models.ForeignKey(Test, on_delete=models.CASCADE)
-#     text = models.CharField(max_length=10000)
-#     passage_index = models.IntegerField()
+class ReadingPassage(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    text = models.CharField(max_length=10000)
+    passage_index = models.IntegerField()
 
 # class SSATVerbalQuestion(models.Model):
 #     test = models.ForeignKey(SSAT, on_delete=models.CASCADE)

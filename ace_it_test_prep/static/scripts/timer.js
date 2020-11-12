@@ -11,8 +11,11 @@ var paused = false;
 var interval;
 var timeRemainingMins = Number(document.querySelector("#time_remaining_mins").value);
 var timeRemainingSecs = document.querySelector("#time_remaining_secs").value;
+var clock_minutes;
+var clock_seconds;
+var seconds_elapsed_now;
 
-if (timeRemainingSecs == 00) {
+if (timeRemainingSecs == 0o0) {
 	timeRemainingSecs = 60;
 }
 
@@ -134,3 +137,5 @@ function pauseTimer() {
 };
 
 window.addEventListener("load", start_timer);
+
+// export { clock_minutes, clock_seconds }
