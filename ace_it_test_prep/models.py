@@ -92,7 +92,7 @@ class TestSession(models.Model):
     time_finished_verbal = models.DateTimeField(blank=True, null=True)
     time_started_math_2 = models.DateTimeField(blank=True, null=True)
     time_finished_math_2 = models.DateTimeField(blank=True, null=True)
-    score = models.ForeignKey("PracticeTestScore", on_delete=models.CASCADE, blank=True, null=True)
+    # score = models.ForeignKey("PracticeTestScore", on_delete=models.CASCADE, blank=True, null=True)
 
 class PracticeSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -101,10 +101,16 @@ class PracticeSession(models.Model):
     time_finished = models.DateTimeField(blank=True, null=True) 
     score = models.ForeignKey("PracticeExerciseScore", on_delete=models.CASCADE, blank=True, null=True)
 
-class PracticeTestScore(models.Model):
-    math_raw = models.IntegerField()
-    reading_raw = models.IntegerField()
-    verbal_raw =  models.IntegerField()
+class PracticeTestSectionScore(models.Model):
+    test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
+    section = models.CharField(choices=SECTION_TYPES, max_length=14)
+    num_correct = models.IntegerField()
+    num_incorrect = models.IntegerField()
+    num_omitted = models.IntegerField()
+    raw_score = models.IntegerField()
+    # math_raw = models.IntegerField()
+    # reading_raw = models.IntegerField()
+    # verbal_raw =  models.IntegerField()
 
 class PracticeExerciseScore(models.Model):
     section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)

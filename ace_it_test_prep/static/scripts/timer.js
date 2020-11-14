@@ -1,5 +1,8 @@
 //https://stackoverflow.com/questions/20851709/how-to-pause-stop-a-timer
 //https://stackoverflow.com/questions/24724852/pause-and-resume-setinterval
+
+import { saveFinalAnswer } from "./practice_test.js"
+
 var seconds = new Date().getTime();
 var last = seconds;
 var mins = document.getElementsByClassName("mins");
@@ -14,6 +17,8 @@ var timeRemainingSecs = document.querySelector("#time_remaining_secs").value;
 var clock_minutes;
 var clock_seconds;
 var seconds_elapsed_now;
+var timerContainer = document.querySelector(".timer-container")
+var sFA = false;
 
 if (timeRemainingSecs == 0o0) {
 	timeRemainingSecs = 60;
@@ -44,7 +49,8 @@ if (timeRemainingSecs == 0o0) {
 //var secs = 1;
 
 function start_timer() {
-
+	console.log("min: ", mins)
+	console.log("secs: ", secs)
 	paused = false;
 	interval = setInterval(function() {
 	var now = new Date().getTime();
@@ -69,6 +75,21 @@ function start_timer() {
 	// console.log("seconds: " + seconds);
 	// console.log("now - seconds: " + (now - seconds));
 	// console.log("now - seconds + seconds_elapsed_before: " + seconds_elapsed_now);
+
+if (clock_minutes == 5) {
+	var flash_timer = setInterval(function() {
+		timerContainer.style.color = (timerContainer.style.color == 'black' ? 'red' : 'black');
+		// mins[0].style.color = (mins[0].style.color == 'black' ? 'red' : 'black');
+		// secs[0].style.color = (secs[0].style.color == 'black' ? 'red' : 'black');
+	}, 500);
+	setTimeout(function() { 
+		clearInterval(flash_timer); 
+		timerContainer.style.color = 'black'
+		endSession();
+	}, 5000);
+} else if (clock_minutes == 0 && clock_minutes <= 30) {
+	timerContainer.style.color = 'red'
+}
 
 
   if (clock_minutes < 0) {
@@ -121,6 +142,7 @@ function start_timer() {
 function endSession() {
   pauseTimer();
   saveFinalAnswer();
+//   sFA = true;
 }
 
 
@@ -138,4 +160,4 @@ function pauseTimer() {
 
 window.addEventListener("load", start_timer);
 
-// export { clock_minutes, clock_seconds }
+export { clock_minutes, clock_seconds }

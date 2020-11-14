@@ -23,7 +23,7 @@
     <input type="hidden" class="remaining_time" value="0">
   	<div class="container">
   		<div class="top-div row">
-        <h5 class="timer border rounded mb-2 p-2"><span>Time Remaining: </span><span class="mins">{{ time_limit }}</span>:<span class="secs">00</span></h5>
+        <h5 class="timer timer-container border rounded mb-2 p-2"><span>Time Remaining: </span><span class="mins">{{ time_limit }}</span>:<span class="secs">00</span></h5>
         <input type="hidden" class="remaining_time" value="0">
         <input type=hidden class="timer mins" id="time_remaining_mins" value="{{ time_limit }}">
         <input type=hidden class="timer secs" id="time_remaining_secs" value="00">
@@ -121,12 +121,12 @@
             </div>
           </div> -->
           <div class="test_section">
-            <form class="text-center pb-4" action="{% url 'ace_it_test_prep:submit_section' %}" method="post">
+            <form id="submit-section-btn-form" class="text-center pb-4" action="{% url 'ace_it_test_prep:submit_section' %}" method="post">
               {% csrf_token %}
               <input type="hidden" id="test_session_id" name="test_session_id" value="{{ test_session_id }}">
               <input type="hidden" id="question_nums" name="question_nums" value="{{ question_nums }}">
               <input type="hidden" id="section" name="section" value="{{ section }}">
-              <button class="btn btn-primary" type="submit">Finish and Submit Test Section</button>
+              <button id="submit-section-btn" class="btn btn-primary" type="submit">Finish and Submit Test Section</button>
             </form>
           </div>
         </div>
@@ -174,8 +174,8 @@
         
       </script>
 
-      <script src="{% static 'scripts/timer.js' %}"></script>
-      <script src="{% static 'scripts/practice_test.js' %}"></script>
+      <script type="module" src="{% static 'scripts/timer.js' %}"></script>
+      <script type="module" src="{% static 'scripts/practice_test.js' %}"></script>
   		
 
 
