@@ -78,22 +78,22 @@ WSGI_APPLICATION = 'ace_it.wsgi.application'
 
 DATABASES = {
     #This is the default sqlite3 db
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'd7kvpcu2lm3mdf',
-    #     'USER': 'tiuomsxbjzcvfs',
-    #     'PASSWORD': 'dba2886dfa385748dd7a826776c02947df80ccf5c523ce1f21ecd84d71ab63ea',
-    #     'HOST': 'ec2-52-204-20-42.compute-1.amazonaws.com',
-    #     'PORT': '5432',
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
+
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'd7kvpcu2lm3mdf',
+        'USER': 'tiuomsxbjzcvfs',
+        'PASSWORD': 'dba2886dfa385748dd7a826776c02947df80ccf5c523ce1f21ecd84d71ab63ea',
+        'HOST': 'ec2-52-204-20-42.compute-1.amazonaws.com',
+        'PORT': '5432',
+    }
 }
 
-print("DATABASES: ", DATABASES)
+# print("DATABASES: ", DATABASES)
 
 
 # Password validation

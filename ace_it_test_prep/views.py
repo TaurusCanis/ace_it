@@ -8,7 +8,7 @@ from .models import (
     ReadingPassage, Section, TestSessionSection, Student, Parent, 
     Instructor, UserProfile, Assignment, AssignmentSession, 
     VocabularyRoot, VocabularyTermSynonym, 
-    VocabularyCentralIdea, PracticeSession, PracticeExercise
+    VocabularyCentralIdea, PracticeSession, PracticeExercise, PracticeTestSectionScore
 )
 from .forms import SignUpForm
 from django.core import serializers
@@ -25,6 +25,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.views import LoginView, LogoutView
+import math
 
 # Create your views here.
 
@@ -440,7 +441,12 @@ class PracticeTestResultsListView(ListView):
         print("questions: ", questions)
         print("user_answers: ", user_answers)
         context['zipped_data'] = zip(user_answers, questions)
+        score_info = PracticeTestSectionScore.objects.get(test_session=test_session, section=section)
+        context['num_correct'] = score_info.num_correct
+        context['num_incorrect'] = score_info.num_incorrect
+        context['num_omitted'] = score_info.num_omitted
         print("CONTEXT: ", context)
+        print("score_info.num_correct: ", score_info.num_correct)
         return context
 
 class PracticeTestResultsDetailView(TemplateView):
@@ -543,6 +549,15 @@ def score_test(test_session_id, section):
             user_answer.answered = False
             num_omitted += 1
         user_answer.save()
+    raw_score = math.ceil(num_correct - num_incorrect * .25)
+    new_practice_test_score = PracticeTestSectionScore()
+    new_practice_test_score.test_session = TestSession.objects.get(id=test_session_id)
+    new_practice_test_score.section = section
+    new_practice_test_score.num_correct = num_correct
+    new_practice_test_score.num_incorrect = num_incorrect
+    new_practice_test_score.num_omitted = num_omitted
+    new_practice_test_score.raw_score = raw_score
+    new_practice_test_score.save()
     return (num_correct, num_incorrect, num_omitted)
 
 
