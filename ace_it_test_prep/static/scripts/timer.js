@@ -82,11 +82,11 @@ if (clock_minutes == 5) {
 		// mins[0].style.color = (mins[0].style.color == 'black' ? 'red' : 'black');
 		// secs[0].style.color = (secs[0].style.color == 'black' ? 'red' : 'black');
 	}, 500);
-	setTimeout(function() { 
-		clearInterval(flash_timer); 
-		timerContainer.style.color = 'black'
-		endSession();
-	}, 5000);
+	// setTimeout(function() { 
+	// 	clearInterval(flash_timer); 
+	// 	timerContainer.style.color = 'black'
+	// 	endSession();
+	// }, 5000);
 } else if (clock_minutes == 0 && clock_minutes <= 30) {
 	timerContainer.style.color = 'red'
 }
