@@ -5,10 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .models import (
     Question, Test, TestSession, TestResponse, Answer, VocabularyTerm, 
-    ReadingPassage, Section, TestSessionSection, Student, Parent, 
-    Instructor, UserProfile, Assignment, AssignmentSession, 
-    VocabularyRoot, VocabularyTermSynonym, 
-    VocabularyCentralIdea, PracticeSession, PracticeExercise, PracticeTestSectionScore
+    ReadingPassage, Student, Parent, 
+    Instructor, UserProfile, PracticeTestSectionScore
 )
 from .forms import SignUpForm
 from django.core import serializers
@@ -304,7 +302,8 @@ class PracticeTestView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         test_session = TestSession.objects.get(user=self.request.user, test_id=kwargs['test_id'])
         print("get_section_statuses: ", get_section_statuses(test_session))
-        if get_section_statuses(test_session)[kwargs['section']]:
+        print("get_section_statuses[kwargs['section']: ", get_section_statuses(test_session)[kwargs['section']])
+        if get_section_statuses(test_session)[kwargs['section']] == 'N':
             kwargs['test_session'] = test_session
             self.create_user_test_responses(**kwargs)
         test_session.started = True
@@ -319,6 +318,8 @@ class PracticeTestView(TemplateView):
         questions = Question.objects.filter(test__id=kwargs['test_id'], section=section).order_by("number")
         return questions
 
+# Need to update section status so new test_responses are not created if a user re-enters a test before finishing
+# Need to consider how to allow for a re-take when a test is complete
     def create_user_test_responses(self, **kwargs):
         questions = self.get_questions(**kwargs)
         test_session = kwargs['test_session']

@@ -3,9 +3,8 @@ from django.db import models
 from django.forms import TextInput, Textarea
 from .models import (
     Test, TestSession, Question, TestResponse, Answer, 
-    Student, Instructor, Assignment, VocabularyRoot, VocabularyTerm, 
-    VocabularyTermSynonym, PracticeSetQuestion, PracticeSet, 
-    VocabularyCentralIdea, ReadingPassage, PracticeExercise
+    Student, Instructor, VocabularyTerm, 
+    ReadingPassage, PracticeExercise
 )
 # Register your models here.
 
@@ -33,13 +32,13 @@ admin.site.register(Answer)
 admin.site.register(Student)
 admin.site.register(Instructor)
 # admin.site.register(TestSessionSection)
-admin.site.register(Assignment)
-admin.site.register(VocabularyRoot)
+# admin.site.register(Assignment)
+# admin.site.register(VocabularyRoot)
 admin.site.register(VocabularyTerm)
-admin.site.register(VocabularyTermSynonym)
-admin.site.register(PracticeSetQuestion)
-admin.site.register(PracticeSet)
-admin.site.register(VocabularyCentralIdea)
+# admin.site.register(VocabularyTermSynonym)
+# admin.site.register(PracticeSetQuestion)
+# admin.site.register(PracticeSet)
+# admin.site.register(VocabularyCentralIdea)
 admin.site.register(ReadingPassage, ReadingPassageAdmin)
 admin.site.register(PracticeExercise)
 

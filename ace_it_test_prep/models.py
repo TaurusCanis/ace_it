@@ -94,12 +94,12 @@ class TestSession(models.Model):
     time_finished_math_2 = models.DateTimeField(blank=True, null=True)
     # score = models.ForeignKey("PracticeTestScore", on_delete=models.CASCADE, blank=True, null=True)
 
-class PracticeSession(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
-    time_started = models.DateTimeField(blank=True, null=True)
-    time_finished = models.DateTimeField(blank=True, null=True) 
-    score = models.ForeignKey("PracticeExerciseScore", on_delete=models.CASCADE, blank=True, null=True)
+# class PracticeSession(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE) ## or models.ForeignKey(SSATPracticeTest)
+#     time_started = models.DateTimeField(blank=True, null=True)
+#     time_finished = models.DateTimeField(blank=True, null=True) 
+#     score = models.ForeignKey("PracticeExerciseScore", on_delete=models.CASCADE, blank=True, null=True)
 
 class PracticeTestSectionScore(models.Model):
     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
@@ -108,55 +108,56 @@ class PracticeTestSectionScore(models.Model):
     num_incorrect = models.IntegerField()
     num_omitted = models.IntegerField()
     raw_score = models.IntegerField()
+    
     # math_raw = models.IntegerField()
     # reading_raw = models.IntegerField()
     # verbal_raw =  models.IntegerField()
 
-class PracticeExerciseScore(models.Model):
-    section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
-    raw_score = models.IntegerField()
+# class PracticeExerciseScore(models.Model):
+#     section = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
+#     raw_score = models.IntegerField()
 
 
 
 
-class Assignment(models.Model):
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, null=True, blank=True)
-    practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE, null=True, blank=True)
-    date_assigned = models.DateTimeField(auto_now_add=True)
-    ##This should probably be changed to allow for future assignments ##
-    due_date = models.DateTimeField(null=True, blank=True)
-    started = models.BooleanField(default=False)
-    completed = models.BooleanField(default=False)
-
-# Is this necessary?
-class AssignmentSession(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-    test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
+# class Assignment(models.Model):
+#     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     test = models.ForeignKey(Test, on_delete=models.CASCADE, null=True, blank=True)
+#     practice_exercise = models.ForeignKey(PracticeExercise, on_delete=models.CASCADE, null=True, blank=True)
+#     date_assigned = models.DateTimeField(auto_now_add=True)
+#     ##This should probably be changed to allow for future assignments ##
+#     due_date = models.DateTimeField(null=True, blank=True)
+#     started = models.BooleanField(default=False)
+#     completed = models.BooleanField(default=False)
 
 # Is this necessary?
-class Section(models.Model):
-    name = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
-    num_questions = models.IntegerField()
-    time_limit = models.IntegerField()
-    test_type = models.CharField(choices=TEST_TYPES, max_length=14, blank=True, null=True)
-    rank = models.IntegerField()
-
-    def __str__(self):
-        return self.name
+# class AssignmentSession(models.Model):
+#     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+#     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
 
 # Is this necessary?
-class TestSessionSection(models.Model):
-    test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    started = models.BooleanField(default=False)
-    completed = models.BooleanField(default=False)
+# class Section(models.Model):
+#     name = models.CharField(choices=SECTION_TYPES, max_length=14, blank=True, null=True)
+#     num_questions = models.IntegerField()
+#     time_limit = models.IntegerField()
+#     test_type = models.CharField(choices=TEST_TYPES, max_length=14, blank=True, null=True)
+#     rank = models.IntegerField()
 
-    def __str__(self):
-        return self.test_session.test.test_type + " - " + self.section.name
+#     def __str__(self):
+#         return self.name
+
+# Is this necessary?
+# class TestSessionSection(models.Model):
+#     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE)
+#     section = models.ForeignKey(Section, on_delete=models.CASCADE)
+#     start_date = models.DateTimeField(null=True, blank=True)
+#     end_date = models.DateTimeField(null=True, blank=True)
+#     started = models.BooleanField(default=False)
+#     completed = models.BooleanField(default=False)
+
+#     def __str__(self):
+#         return self.test_session.test.test_type + " - " + self.section.name
 
 
 # class SCAT(models.Model):
@@ -222,12 +223,12 @@ class ReadingPassage(models.Model):
 #     difficulty = models.CharField(max_length=10)
 
 
-class PracticeExerciseResponse(models.Model):
-    session = models.ForeignKey(PracticeSession, on_delete=models.CASCADE, blank=False)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
-    response = models.IntegerField(default=-1)
-    answered = models.BooleanField(default=False)
-    correct = models.BooleanField(default=False)
+# class PracticeExerciseResponse(models.Model):
+#     session = models.ForeignKey(PracticeSession, on_delete=models.CASCADE, blank=False)
+#     question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=False)
+#     response = models.IntegerField(default=-1)
+#     answered = models.BooleanField(default=False)
+#     correct = models.BooleanField(default=False)
 
 class TestResponse(models.Model):
     session = models.ForeignKey(TestSession, on_delete=models.CASCADE, blank=False)
@@ -253,8 +254,8 @@ class VocabularyTerm(models.Model):
     def __str__(self):
         return self.term
 
-class VocabularySet(models.Model):
-    source = models.CharField(max_length=100)
+# class VocabularySet(models.Model):
+#     source = models.CharField(max_length=100)
 
 class VocabularyRoot(models.Model):
     root_type = models.CharField(choices=[("P", "Prefix"), ("R", "Root"), ("S", "Suffix")], max_length=1)
@@ -264,39 +265,39 @@ class VocabularyRoot(models.Model):
     def __str__(self):
         return self.term
 
-class VocabularyTermSynonym(models.Model):
-    term = models.ForeignKey(VocabularyTerm, on_delete=models.CASCADE)
-    option_a = models.CharField(max_length=100)
-    option_b = models.CharField(max_length=100)
-    option_c = models.CharField(max_length=100)
-    option_d = models.CharField(max_length=100)
-    option_e = models.CharField(max_length=100, blank=True, null=True)
-    correct_answer = models.CharField(max_length=100)
+# class VocabularyTermSynonym(models.Model):
+#     term = models.ForeignKey(VocabularyTerm, on_delete=models.CASCADE)
+#     option_a = models.CharField(max_length=100)
+#     option_b = models.CharField(max_length=100)
+#     option_c = models.CharField(max_length=100)
+#     option_d = models.CharField(max_length=100)
+#     option_e = models.CharField(max_length=100, blank=True, null=True)
+#     correct_answer = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.term.term
+#     def __str__(self):
+#         return self.term.term
 
-    def natural_key(self):
-        return self.term.term
+#     def natural_key(self):
+#         return self.term.term
 
-class PracticeSet(models.Model):
-    section = models.CharField(max_length=200)
-    sub_section = models.CharField(max_length=200)
-    sub_section_category = models.CharField(max_length=200)
+# class PracticeSet(models.Model):
+#     section = models.CharField(max_length=200)
+#     sub_section = models.CharField(max_length=200)
+#     sub_section_category = models.CharField(max_length=200)
 
-class PracticeSetQuestion(models.Model):
-    question = models.CharField(max_length=10000)
-    diagram = models.CharField(max_length=10000, blank=True, null=True)
-    passage = models.CharField(max_length=10000, blank=True, null=True)
-    extra_info_text = models.CharField(max_length=10000, blank=True, null=True)
-    option_a = models.CharField(max_length=300)
-    option_b = models.CharField(max_length=300)
-    option_c = models.CharField(max_length=300)
-    option_d = models.CharField(max_length=300)
-    option_e = models.CharField(max_length=300, blank=True, null=True)
-    correct_answer = models.CharField(max_length=300)
-    category_1 = models.CharField(max_length=300)
-    category_2 = models.CharField(max_length=300)
+# class PracticeSetQuestion(models.Model):
+#     question = models.CharField(max_length=10000)
+#     diagram = models.CharField(max_length=10000, blank=True, null=True)
+#     passage = models.CharField(max_length=10000, blank=True, null=True)
+#     extra_info_text = models.CharField(max_length=10000, blank=True, null=True)
+#     option_a = models.CharField(max_length=300)
+#     option_b = models.CharField(max_length=300)
+#     option_c = models.CharField(max_length=300)
+#     option_d = models.CharField(max_length=300)
+#     option_e = models.CharField(max_length=300, blank=True, null=True)
+#     correct_answer = models.CharField(max_length=300)
+#     category_1 = models.CharField(max_length=300)
+#     category_2 = models.CharField(max_length=300)
 
 class VocabularyCentralIdea(models.Model):
     idea_name = models.CharField(max_length=100)
