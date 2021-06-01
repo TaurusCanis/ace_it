@@ -1,0 +1,11 @@
+<a href="{% url 'question_maker:view_analogies' %}">View Analogies</a>
+<form action="{% url 'question_maker:create_analogies' %}" method="POST">
+  {% csrf_token %}
+  <div>
+    <label for="num_questions">Number of Questions:
+    <input type="text" name="num_questions">
+  </div>
+  <div>
+    <input type="submit" value="Create Analoges Questions">
+  </div>
+</form>

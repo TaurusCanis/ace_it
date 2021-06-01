@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import django_heroku
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,10 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'q24c=a0x_w)0^sf3+@686$et#0$v8hu!@f@8#@$z=r53%+sjyv'
+SECRET_KEY = os.environ.get('SECRET_KEY', config("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'ace_it_test_prep',
+    'question_maker',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -78,22 +81,31 @@ WSGI_APPLICATION = 'ace_it.wsgi.application'
 
 DATABASES = {
     #This is the default sqlite3 db
-    # 'default': {
+    # 'sqlite_db': {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-
+    # },
+    #
+    # 'test_prep': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': config('DB2_NAME'),
+        # 'USER': config('DB2_USER'),
+        # 'PASSWORD': config('DB2_PASSWORD'),
+        # 'HOST': config('DB2_HOST'),
+        # 'PORT': config('DB2_PORT'),
+    # },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dejn336mcqb1gc',
-        'USER': 'irggnoclnyfwpj',
-        'PASSWORD': '1ce0d7ce20b86a922304ade0dcb286aa794d246facbe9ab168e66bd5ffd05a55',
-        'HOST': 'ec2-3-91-112-166.compute-1.amazonaws.com',
-        'PORT': '5432',
-    }
+        'NAME': config('NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('PASSWORD'),
+        'HOST': config('HOST'),
+        'PORT': config('PORT'),
+    },
+
 }
 
-# print("DATABASES: ", DATABASES)
+
 
 
 # Password validation

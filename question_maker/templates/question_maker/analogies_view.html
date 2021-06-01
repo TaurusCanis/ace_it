@@ -1,0 +1,17 @@
+{% extends "question_maker/base.html" %}
+{% block body %}
+<h1>Analogies</h1>
+{% for analogy in analogy_data %}
+{% if analogy.analogy.word_C %}
+  <div>{{ forloop.counter }}. {{ analogy.analogy.word_A.word.word }} is to {{ analogy.analogy.word_B.word.word }} as {{ analogy.analogy.word_C.word.word }} is to</div>
+  {% for answer_option in analogy.analogy_answer_option %}
+    <div>{{ answer_option.word_D.word.word }} - CORRECT: {{ answer_option.is_correct }}</div>
+  {% endfor %}
+{% else %}
+  <div>{{ forloop.counter }}. {{ analogy.analogy.word_A.word.word }} is to {{ analogy.analogy.word_B.word.word }} as</div>
+  {% for answer_option in analogy.analogy_answer_option %}
+    <div>{{ answer_option.word_C.word.word }} is to {{ answer_option.word_D.word.word }} - CORRECT: {{ answer_option.is_correct }}</div>
+  {% endfor %}
+{% endif %}
+{% endfor %}
+{% endblock %}

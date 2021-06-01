@@ -1,0 +1,83 @@
+{% extends 'question_maker/base.html' %}
+{% load static %}
+{% load question_maker_extras %}
+{% block body %}
+<form id="save_synonym_form" action="{% url 'question_maker:update_synonym' synonyms_list.0.synonym.id %}" method="POST">
+  {% csrf_token %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Word</th>
+      <th>is_correct</th>
+      <th>Alternate Options</th>
+      <th>Random Word</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for synonym in synonyms_list %}
+
+    <tr class="has-text-weight-bold">
+        <td>{{ forloop.counter }}</td>
+        <td id="synonym_word">{{ synonym.synonym.word.word }}</td>
+        <td></td>
+    </tr>
+    {% for option in synonym.synonym_answer_options %}
+      <tr>
+        <td>{{ forloop.counter|to_letter }}</td>
+        <input form="save_synonym_form" type="hidden" name="selected-answer-option_{{ forloop.counter }}" value="{{ option.value }}" id="selected-answer-option_{{ forloop.counter }}">
+        <td id="option_{{ forloop.counter|to_letter }}">{{ option.value }}</td>
+        <td>{{ option.is_correct }}</td>
+        <td>
+        <input type="radio" form="save_synonym_form" id="definition-alternates_{{ option.id }}" name="option_{{ forloop.counter0 }}">
+          <select form="update_synonym_form" name="definition-alternates_{{ option.id }}">
+              <option value=None>None</option>
+              {% for key, value in synonym.definition_answer_option_alternates_dict.items %}
+                <optgroup label="{{ key }}">
+                {% for item in value %}
+                  <option value="{{ item }}">{{ item }} </option>
+                {% endfor %}
+              {% endfor %}
+          </select>
+        </td>
+        <td>
+          <input type="radio" form="save_synonym_form" name="option_{{ forloop.counter0 }}" id="random-word-option_{{ option.id }}" value="{{ synonym.random_words|get_random_word:forloop.counter0 }}">
+          <input type="hidden" id="random_word_input_{{ option.id }}" name="random_word_input_{{ forloop.counter0 }}" value="{{ synonym.random_words|get_random_word:forloop.counter0 }}" form="update_synonym_form">
+          <span id="random_word_text_{{ option.id }}">{{ synonym.random_words|get_random_word:forloop.counter0 }}</span>
+        </td>
+        <td>
+          <button id="random-word-btn_{{ option.id }}"random_word_btn>New Random Word</button>
+        </td>
+        <td>
+          <input type="radio" form="save_synonym_form" id="custom_word_input_{{ option.id }}" name="option_{{ forloop.counter0 }}" value="">
+          <input type="text" name="custom_word_input_{{ option.id }}" placeholder="Custom Word">
+        </td>
+        <td>
+          <button type="submit" class="update_synonym_button" id="update-synonym-button_{{ forloop.counter0 }}">Update</button>
+        </td>
+      </tr>
+    {% endfor %}
+
+  {% endfor %}
+  </tbody>
+</table>
+<div>
+  <label>Difficulty: </label>
+  <select name="synonym_difficulty">
+    <option {% if synonyms_list.0.synonym.difficulty == "E" %} selected {% endif %} value="E">Easy</option>
+    <option {% if synonyms_list.0.synonym.difficulty == "M" %} selected {% endif %} value="M">Medium</option>
+    <option {% if synonyms_list.0.synonym.difficulty == "H" %} selected {% endif %} value="H">Hard</option>
+  </select>
+</div>
+<div>
+  <label for="has_been_vetted">Has Been Vetted: </label>
+  <input form="save_synonym_form" id="has_been_vetted" {% if synonyms_list.0.synonym.has_been_vetted %} checked {% endif %} type="checkbox" name="has_been_vetted">
+</div>
+<input type="submit" value="Save">
+</form>
+<form action="{% url 'question_maker:delete_synonym' synonyms_list.0.synonym.id %}" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Delete">
+</form>
+<script type="text/javascript" src="{% static 'question_maker/js/update_synonym.js' %}"></script>
+{% endblock %}

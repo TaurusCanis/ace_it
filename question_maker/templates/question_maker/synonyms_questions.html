@@ -1,0 +1,86 @@
+{% extends 'question_maker/base.html' %}
+{% load question_maker_extras %}
+{% block body %}
+  <h2>Verbal Questions</h2>
+  <form method="POST" action="{% url 'question_maker:synonyms_questions' %}">
+    {% csrf_token %}
+    <input type="submit" value="Create New Synonyms Question">
+  </form>
+  {% if words_list %}
+  <h3>Created Questions</h3>
+  {% for word_item in words_list %}
+<section class="section">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="level">{{ forloop.counter }}: {{ word_item.word.word }} - ID: {{ synonym_id }}</div>
+        {% for synonym_answer_option in synonyms_answer_options_list %}
+        <div>
+            <span>{{ synonym_answer_option.value }} - {{ synonym_answer_option.answer_type }}</span>
+            {% if synonym_answer_option.answer_type != 'random_word' %}
+                {% if synonym_answer_option.answer_type == 'synonym' and synonym_answer_option.value|length > 0 %}
+                    <span>
+                        <select>
+                            {% for option_item in word_item.synonyms_list %}
+                            <option value="{{ option_item }}">{{ option_item }} </option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                {% else %}
+                    <span>
+                        <select>
+                            {% for option_item in word_item.answer_options_list|keyvalue:synonym_answer_option.answer_type %}
+                            <option value="{{ option_item }}">{{ option_item }} </option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+<!--            {% for name, value in synonym_answer_option.get_fields %}-->
+<!--                <div>{{ name }} - {{ value }}</div>-->
+<!--            {% endfor %}-->
+        {% endfor %}
+ 
+  <input type="submit" value="Save Changes">
+  </form>
+  <div>
+    <div>
+        Selected Definition:
+    </div>
+    <div>
+        {% for key, value in word_item.suggested_definition_dict.items %}
+          {% if value is not None and key != 'id' and key != 'word' %}
+            <div>
+                {{ key }} -
+                <select>
+                    {% for option_item in value %}
+                    <option value="{{ option_item }}">{{ option_item }} </option>
+                    {% endfor %}
+                </select>
+            </div>
+          {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+      <div>Alternate Definitions</div>
+        {% for definition in word_item.alternate_definitions_list %}
+            {% for key, value in definition.items %}
+                {% if value is not None and key != 'id' and key != 'word' %}
+                  <div>
+                      {{ key }} -
+                      <select>
+                          {% for option_item in value %}
+                          <option value="{{ option_item }}">{{ option_item }} </option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+    </section>
+  {% endfor %}
+
+  {% endif %}
+{% endblock %}

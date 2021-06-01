@@ -1,0 +1,14 @@
+{% extends 'question_maker/base.html' %}
+{% load static %}
+{% block body %}
+<script src="{% static 'scripts/practice_test_script.js' %}"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js">
+</script>
+<h1>MATH</h1>
+<img src="data:image/png;base64,{{ graphic|safe }}">
+<div>{{ question|safe }}</div>
+{% for option in options %}
+<div>{{ option.option|safe }}</div>
+{% endfor %}
+{% endblock %}
