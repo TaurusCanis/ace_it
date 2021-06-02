@@ -1,3 +1,6 @@
+question_maker/
+ace_it_test_prep/management/commands/
+
 # Django #
 *.log
 *.pot
