@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'ace_it_test_prep',
-    'question_maker',
+    # 'question_maker',
     'rest_framework',
 ]
 
