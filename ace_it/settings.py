@@ -88,11 +88,11 @@ DATABASES = {
     #
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', config("DB2_NAME")),
+        'NAME': os.environ.get('DB_NAME', config("DB_NAME")),
         'USER': os.environ.get('DB_USER', config("DB_USER")),
-        'PASSWORD': os.environ.get('DB_PASSWORD', config("DB2_PASSWORD")),
-        'HOST': os.environ.get('DB_HOST', config("DB2_HOST")),
-        'PORT': os.environ.get('DB_PORT', config("DB2_PORT")),
+        'PASSWORD': os.environ.get('DB_PASSWORD', config("DB_PASSWORD")),
+        'HOST': os.environ.get('DB_HOST', config("DB_HOST")),
+        'PORT': os.environ.get('DB_PORT', config("DB_PORT")),
     },
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
